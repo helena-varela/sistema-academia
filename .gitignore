@@ -1,0 +1,32 @@
+# ==========================================
+# Compilação e Binários (Regras do Makefile)
+# ==========================================
+# Ignora toda a pasta bin, onde ficam os arquivos .o e o executável
+bin/
+
+# Caso alguém compile manualmente fora da pasta bin:
+*.o
+*.out
+*.exe
+
+# ==========================================
+# Arquivos de Sistema e IDEs (Windows/Linux)
+# ==========================================
+# Windows (Amigos do grupo)
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux (Você)
+.directory
+.DS_Store
+
+# VS Code (Configurações locais de quem estiver editando)
+.vscode/
+
+# ==========================================
+# Arquivos Temporários / Backup
+# ==========================================
+*.swp
+*~
+.bak
