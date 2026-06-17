@@ -30,3 +30,6 @@ $RECYCLE.BIN/
 *.swp
 *~
 .bak
+
+# Ignora os arquivos de texto dentro de data, mas mantém a pasta
+data/*.txt
