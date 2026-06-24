@@ -5,8 +5,9 @@
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
+#include "Pessoa.hpp"
 
-class Cliente 
+class Cliente : public Pessoa
 {
     private:
         Plano* planoAtual;

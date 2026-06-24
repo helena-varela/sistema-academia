@@ -3,17 +3,24 @@
 
 #include <string>
 
+enum class statusMatricula
+{
+    ATIVA,
+    INADIMPLENTE,
+    TRANCADA
+};
+
 class Matricula 
 {
     private:
         std::string codigoMatricula;
-        std::string statusAtual; //Aqui era pra ser um enum, suponho
+        statusMatricula statusAtual; //Aqui era pra ser um enum, suponho
         std::string dataInicio; //da pra formatar acho
     public:
         Matricula(std::string codigoMatricula, std::string dataInicio);
-        void alterarEstado(std::string novoEstado); //aplicar Enum class
-        bool validarTransicao(std::string statusAtual, std::string novoEstado);
-        std::string getStatus();
+        void alterarEstado(statusMatricula novoEstado); //aplicar Enum class
+        bool validarTransicao(statusMatricula statusAtual, statusMatricula novoEstado);
+        statusMatricula getStatus();
 };
 
 #endif
