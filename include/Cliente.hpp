@@ -2,12 +2,11 @@
 #define CLIENTE_HPP
 
 #include <string>
-#include "Pessoa.hpp"
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
 
-class Cliente : public Pessoa
+class Cliente 
 {
     private:
         Plano* planoAtual;
