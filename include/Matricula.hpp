@@ -2,6 +2,7 @@
 #define MATRICULA_HPP
 
 #include <string>
+#include "AcademiaException.hpp"
 
 enum class statusMatricula
 {

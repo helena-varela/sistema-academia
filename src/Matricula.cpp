@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../include/Matricula.hpp"
-using namespace std;
 
 Matricula::Matricula(std::string codigoMatricula, std::string dataInicio)
 {
@@ -11,7 +10,22 @@ Matricula::Matricula(std::string codigoMatricula, std::string dataInicio)
 
 void Matricula::alterarEstado(statusMatricula novoEstado)
 {
+    if (!validarTransicao(statusAtual, novoEstado))
+    {
+        throw AcademiaException("Transicao de estado invalida.");
+    }
+
     statusAtual = novoEstado;
+}
+
+bool Matricula::validarTransicao(statusMatricula atual, statusMatricula novoEstado)
+{
+    if (atual == statusMatricula::INADIMPLENTE && novoEstado == statusMatricula::TRANCADA)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 statusMatricula Matricula::getStatus()
