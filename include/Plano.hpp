@@ -9,7 +9,7 @@ class Plano
         double precoBase;
     public:
         Plano(double precoBase);
-        virtual double calcularmensalidade() = 0;
+        virtual double calcularMensalidade() = 0;
         virtual bool aplicarRestricaoAcesso(std::string horaAcesso) = 0;
         virtual ~Plano();
 };
