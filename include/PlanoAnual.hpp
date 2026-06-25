@@ -2,7 +2,6 @@
 #define PLANOANUAL_HPP
 
 #include "Plano.hpp"
-#include <string>
 
 class PlanoAnual : public Plano
 {
@@ -12,7 +11,7 @@ class PlanoAnual : public Plano
     public:
         PlanoAnual(double precoBase, int mesesFidelidade, double descontoFidelidade);
         double calcularMensalidade() override;
-        bool aplicarRestricaoAcesso(std::string horaAcesso) override;
+        bool aplicarRestricaoAcesso(int horaAcesso) override;
 };
 
 #endif
