@@ -1,12 +1,21 @@
 #include "PlanoMensal.hpp"
+#include <iostream>
 
 PlanoMensal::PlanoMensal(double preco, double taxa) 
   : Plano(preco), taxaInscricaoAvulsa(taxa) {}
 
 double PlanoMensal::calcularMensalidade() {
-  return 0.0;
-}
+  double valor;
 
-bool PlanoMensal::aplicarRestricaoAcesso(std::string horaAcesso) {
+  valor = precoBase + taxaInscricaoAvulsa;
+
+  return valor;
+} 
+
+bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
+  if(horaAcesso <= 18 && horaAcesso >= 20) {
+    std::cout << "Horário de pico. Acesso bloqueado!" << std::endl;
+    return false;
+  }
   return true;
 }

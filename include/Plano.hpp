@@ -1,8 +1,6 @@
 #ifndef PLANO_HPP
 #define PLANO_HPP
 
-#include <string>
-
 class Plano 
 {
     protected:
@@ -10,7 +8,7 @@ class Plano
     public:
         Plano(double precoBase);
         virtual double calcularMensalidade() = 0;
-        virtual bool aplicarRestricaoAcesso(std::string horaAcesso) = 0;
+        virtual bool aplicarRestricaoAcesso(int horaAcesso) = 0;
         virtual ~Plano();
 };
 

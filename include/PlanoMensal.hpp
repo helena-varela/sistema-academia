@@ -2,7 +2,6 @@
 #define PLANOMENSAL_HPP
 
 #include "Plano.hpp"
-#include <string>
 
 class PlanoMensal : public Plano
 {
@@ -11,7 +10,7 @@ class PlanoMensal : public Plano
     public:
         PlanoMensal(double precoBase, double taxaInscricaoAvulsa);
         double calcularMensalidade() override;
-        bool aplicarRestricaoAcesso(std::string horaAcesso) override;
+        bool aplicarRestricaoAcesso(int horaAcesso) override;
 };
 
 #endif
