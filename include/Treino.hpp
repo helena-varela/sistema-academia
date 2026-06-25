@@ -13,6 +13,8 @@ class Treino
     public:
         Treino(std::string focoMuscular, std::list<std::string> exercicios, int duracaoEstimadaMin);
         std::string getFoco();
+        std::list<std::string> getExercicios();
+        int getDuracao();
 };
 
 #endif
