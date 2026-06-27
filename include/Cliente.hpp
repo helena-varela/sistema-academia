@@ -12,7 +12,7 @@ class Cliente : public Pessoa
     private:
         Plano* planoAtual;
         Treino* treinoDesignado;
-        Matricula* matricula;
+        Matricula matricula;
     public:
         Cliente(std::string nome, std::string cpf, std::string email, Plano* plano);
         void associarTreino(Treino* t);

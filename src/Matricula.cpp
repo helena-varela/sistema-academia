@@ -1,14 +1,16 @@
 #include <iostream>
 #include "../include/Matricula.hpp"
 
-Matricula::Matricula(std::string codigoMatricula, std::string dataInicio)
+int Matricula::ultimoCodigo = 0;
+
+Matricula::Matricula(std::string dataInicio)
 {
-    this->codigoMatricula = codigoMatricula;
+    codigoMatricula = ++ultimoCodigo;
     this->dataInicio = dataInicio;
-    statusAtual = statusMatricula::ATIVA;
+    statusAtual = StatusMatricula::ATIVA;
 }
 
-void Matricula::alterarEstado(statusMatricula novoEstado)
+void Matricula::alterarEstado(StatusMatricula novoEstado)
 {
     if (!validarTransicao(statusAtual, novoEstado))
     {
@@ -18,9 +20,9 @@ void Matricula::alterarEstado(statusMatricula novoEstado)
     statusAtual = novoEstado;
 }
 
-bool Matricula::validarTransicao(statusMatricula atual, statusMatricula novoEstado)
+bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEstado)
 {
-    if (atual == statusMatricula::INADIMPLENTE && novoEstado == statusMatricula::TRANCADA)
+    if (atual == StatusMatricula::INADIMPLENTE && novoEstado == StatusMatricula::TRANCADA)
     {
         return false;
     }
@@ -28,7 +30,12 @@ bool Matricula::validarTransicao(statusMatricula atual, statusMatricula novoEsta
     return true;
 }
 
-statusMatricula Matricula::getStatus()
+StatusMatricula Matricula::getStatus()
 {
     return statusAtual;
+}
+
+int Matricula::getCodigoMatricula()
+{
+    return codigoMatricula;
 }

@@ -4,7 +4,7 @@
 #include <string>
 #include "AcademiaException.hpp"
 
-enum class statusMatricula
+enum class StatusMatricula
 {
     ATIVA,
     INADIMPLENTE,
@@ -14,14 +14,16 @@ enum class statusMatricula
 class Matricula 
 {
     private:
-        std::string codigoMatricula;
-        statusMatricula statusAtual; //Aqui era pra ser um enum, suponho
+        static int ultimoCodigo;
+        int codigoMatricula;
+        StatusMatricula statusAtual; //Aqui era pra ser um enum, suponho
         std::string dataInicio; //da pra formatar acho
     public:
-        Matricula(std::string codigoMatricula, std::string dataInicio);
-        void alterarEstado(statusMatricula novoEstado); //aplicar Enum class
-        bool validarTransicao(statusMatricula statusAtual, statusMatricula novoEstado);
-        statusMatricula getStatus();
+        Matricula(std::string dataInicio);
+        void alterarEstado(StatusMatricula novoEstado); //aplicar Enum class
+        bool validarTransicao(StatusMatricula statusAtual, StatusMatricula novoEstado);
+        int getCodigoMatricula();
+        StatusMatricula getStatus();
 };
 
 #endif
