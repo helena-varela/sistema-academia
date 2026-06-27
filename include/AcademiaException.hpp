@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+#include <exception>
 
 class AcademiaException : public std::exception
 {

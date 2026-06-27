@@ -8,20 +8,19 @@
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
+#include "Pessoa.hpp"
 
 class Cliente : public Pessoa
 {
     private:
         Plano* planoAtual;
         Treino* treinoDesignado;
-        std::string codigoMatricula;
-        Matricula* matricula;
+        Matricula matricula;
     public:
         Cliente(const std::string& nome,
              const std::string& cpf,
              const std::string& email,
              Plano* plano,
-             const std::string& codigoMatricula,
              const std::string& dataInicio);
 
          ~Cliente() override;
@@ -30,11 +29,9 @@ class Cliente : public Pessoa
 
         Plano* getPlanoAtual() const;
 
-        Matricula* getMatricula() const;
-
         Treino* getTreinoDesignado() const;
 
-        std::string getCodigoMatricula() const;
+        int getCodigoMatricula() const;
 
         // void consultarCliente(std::string cpf);
 

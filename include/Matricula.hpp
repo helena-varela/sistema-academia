@@ -2,18 +2,28 @@
 #define MATRICULA_HPP
 
 #include <string>
+#include "AcademiaException.hpp"
+
+enum class StatusMatricula
+{
+    ATIVA,
+    INADIMPLENTE,
+    TRANCADA
+};
 
 class Matricula 
 {
     private:
-        std::string codigoMatricula;
-        std::string statusAtual; //Aqui era pra ser um enum, suponho
+        static int ultimoCodigo;
+        int codigoMatricula;
+        StatusMatricula statusAtual; //Aqui era pra ser um enum, suponho
         std::string dataInicio; //da pra formatar acho
     public:
-        Matricula(std::string codigoMatricula, std::string dataInicio);
-        void alterarEstado(std::string novoEstado); //aplicar Enum class
-        bool validarTransicao(std::string statusAtual, std::string novoEstado);
-        std::string getStatus();
+        Matricula(std::string dataInicio);
+        void alterarEstado(StatusMatricula novoEstado); //aplicar Enum class
+        bool validarTransicao(StatusMatricula statusAtual, StatusMatricula novoEstado);
+        int getCodigoMatricula() const;
+        StatusMatricula getStatus() const;
 };
 
 #endif

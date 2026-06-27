@@ -4,19 +4,12 @@ Cliente::Cliente(const std::string& nome,
                  const std::string& cpf,
                  const std::string& email,
                  Plano* plano,
-                 const std::string& codigoMatricula,
                  const std::string& dataInicio)
     : Pessoa(nome, cpf, email),
-      codigoMatricula(codigoMatricula),
       planoAtual(plano),
       treinoDesignado(nullptr),
-      matricula(new Matricula(codigoMatricula, dataInicio))
+      matricula(dataInicio)
 {
-}
-
-Cliente::~Cliente()
-{
-    delete matricula;
 }
 
 void Cliente::associarTreino(Treino* treino)
@@ -29,19 +22,14 @@ Plano* Cliente::getPlanoAtual() const
     return planoAtual;
 }
 
-Matricula* Cliente::getMatricula() const
-{
-    return matricula;
-}
-
 Treino* Cliente::getTreinoDesignado() const
 {
     return treinoDesignado;
 }
 
-std::string Cliente::getCodigoMatricula() const
+int Cliente::getCodigoMatricula() const
 {
-    return codigoMatricula;
+    return matricula.getCodigoMatricula();
 }
 
 std::ostream& operator<<(std::ostream& os, const Cliente& cliente)
