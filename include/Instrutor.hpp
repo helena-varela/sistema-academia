@@ -1,19 +1,29 @@
 #ifndef INSTRUTOR_HPP
 #define INSTRUTOR_HPP
 
-#include "pessoa.hpp"
-#include "Cliente.hpp"
 #include <string>
 #include <list>
+
+#include "Pessoa.hpp"
+#include "Cliente.hpp"
+#include "Treino.hpp"
 
 class Instrutor : public Pessoa
 {
     private:
         std::string cref;
         std::string especialidade;
-        std::list<Cliente*> alunossobsupervisao;
+        std::list<Cliente*> alunosSobSupervisao;
     public:
-        Instrutor(std::string nome, std::string cpf, std::string email, std::string cref, std::string especialidade);
+        Instrutor(const std::string& nome,
+              const std::string& cpf,
+              const std::string& email,
+              const std::string& cref,
+              const std::string& especialidade);
+
         void prescreverTreino(Cliente* aluno, Treino* novoTreino);
+
+        std::string getCref() const;
+        std::string getEspecialidade() const;
 };
 #endif // INSTRUTOR_HPP

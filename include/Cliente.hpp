@@ -1,24 +1,45 @@
 #ifndef CLIENTE_HPP
 #define CLIENTE_HPP
 
+#include<iostream>
+
 #include <string>
+#include "Pessoa.hpp"
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
 
-class Cliente 
+class Cliente : public Pessoa
 {
     private:
         Plano* planoAtual;
         Treino* treinoDesignado;
+        std::string codigoMatricula;
         Matricula* matricula;
     public:
-        Cliente(std::string nome, std::string cpf, std::string email, Plano* plano);
-        void associarTreino(Treino* t);
-        void consultarCliente(std::string cpf);
-        Plano* getPlanoAtual();
-        friend std::ostream& operator <<(std::ostream& os, const Cliente& c);
-        friend std::istream& operator >>(std::istream& is, const Cliente& c);
+        Cliente(const std::string& nome,
+             const std::string& cpf,
+             const std::string& email,
+             Plano* plano,
+             const std::string& codigoMatricula,
+             const std::string& dataInicio);
+
+         ~Cliente() override;
+
+        void associarTreino(Treino* treino);
+
+        Plano* getPlanoAtual() const;
+
+        Matricula* getMatricula() const;
+
+        Treino* getTreinoDesignado() const;
+
+        std::string getCodigoMatricula() const;
+
+        // void consultarCliente(std::string cpf);
+
+        friend std::ostream& operator<<(std::ostream& os, const Cliente& cliente);
+        friend std::istream& operator>>(std::istream& is, Cliente& cliente);
 };
 
 #endif
