@@ -1,6 +1,7 @@
 #ifndef ACADEMIAEXCEPTION_HPP
 #define ACADEMIAEXCEPTION_HPP
 
+#include <exception>
 #include <string>
 #include <exception>
 
@@ -9,7 +10,7 @@ class AcademiaException : public std::exception
     private:
         std::string mensagemErro;
     public:
-        AcademiaException(std::string mensagemErro);
+        explicit AcademiaException(const std::string& mensagemErro);
         const char* what() const noexcept override;
 };
 

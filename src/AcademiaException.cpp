@@ -1,9 +1,7 @@
 #include "AcademiaException.hpp"
 
-AcademiaException::AcademiaException(std::string mensagemErro)
-{
-    this->mensagemErro = mensagemErro;
-}
+AcademiaException::AcademiaException(const std::string& msg)
+ : mensagemErro(msg) {}
 
 const char* AcademiaException::what() const noexcept
 {
