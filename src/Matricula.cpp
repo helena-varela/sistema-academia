@@ -30,12 +30,12 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
     return true;
 }
 
-StatusMatricula Matricula::getStatus()
+StatusMatricula Matricula::getStatus() const
 {
     return statusAtual;
 }
 
-int Matricula::getCodigoMatricula()
+int Matricula::getCodigoMatricula() const
 {
     return codigoMatricula;
 }

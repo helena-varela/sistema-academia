@@ -21,7 +21,6 @@ class Cliente : public Pessoa
              const std::string& cpf,
              const std::string& email,
              Plano* plano,
-             const std::string& codigoMatricula,
              const std::string& dataInicio);
 
          ~Cliente() override;
@@ -30,11 +29,9 @@ class Cliente : public Pessoa
 
         Plano* getPlanoAtual() const;
 
-        Matricula* getMatricula() const;
-
         Treino* getTreinoDesignado() const;
 
-        std::string getCodigoMatricula() const;
+        int getCodigoMatricula() const;
 
         // void consultarCliente(std::string cpf);
 

@@ -22,8 +22,8 @@ class Matricula
         Matricula(std::string dataInicio);
         void alterarEstado(StatusMatricula novoEstado); //aplicar Enum class
         bool validarTransicao(StatusMatricula statusAtual, StatusMatricula novoEstado);
-        int getCodigoMatricula();
-        StatusMatricula getStatus();
+        int getCodigoMatricula() const;
+        StatusMatricula getStatus() const;
 };
 
 #endif
