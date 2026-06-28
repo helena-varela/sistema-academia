@@ -47,7 +47,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
             } 
             break;
     }
-    
+    throw AcademiaException("Transição de estado inválida.");
 }
 
 StatusMatricula Matricula::getStatus() const //getter de status
