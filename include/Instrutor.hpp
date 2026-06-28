@@ -29,5 +29,6 @@ class Instrutor : public Pessoa
 
         std::string getCref() const;
         std::string getEspecialidade() const;
+        std::list<Cliente*> getAlunosSobSupervisao() const;
 };
 #endif // INSTRUTOR_HPP

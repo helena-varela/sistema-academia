@@ -75,3 +75,8 @@ std::string Instrutor::getEspecialidade() const
 {
     return especialidade;
 }
+
+std::list<Cliente*> Instrutor::getAlunosSobSupervisao() const
+{
+    return alunosSobSupervisao;
+}
