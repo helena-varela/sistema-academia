@@ -9,6 +9,7 @@
 #include "Treino.hpp"
 #include "Matricula.hpp"
 #include "Pessoa.hpp"
+#include "AcademiaException.hpp"
 
 class Cliente : public Pessoa
 {

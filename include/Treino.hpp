@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include "AcademiaException.hpp"
 
 class Treino
 {

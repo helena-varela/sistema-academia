@@ -6,13 +6,13 @@ Treino::Treino(std::string focoMuscular, std::list<std::string> exercicios, int 
     // 1º regras de negócio: a lista de exercícios não pode estar vazia
     if (exercicios.empty())
     {
-        throw std::invalid_argument("O treino deve ter pelo menos um exercício");
+        throw AcademiaException("O treino deve ter pelo menos um exercício");
     }
     
     // 2º regra de negócio: a duração deve ser maior que 0 minutos
     if (duracaoEstimadaMin <= 0)
     {
-        throw std::invalid_argument("O treino deve ter duração maior que 0 minutos");
+        throw AcademiaException("O treino deve ter duração maior que 0 minutos");
     }
     
     // inicialização
