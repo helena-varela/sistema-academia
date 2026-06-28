@@ -12,6 +12,10 @@ Cliente::Cliente(const std::string& nome,
 {
 }
 
+Cliente::~Cliente()
+{
+}
+
 void Cliente::associarTreino(Treino* treino)
 {
     if (treino == nullptr)
