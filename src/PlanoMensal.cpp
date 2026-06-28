@@ -13,7 +13,7 @@ double PlanoMensal::calcularMensalidade() {
 } 
 
 bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
-  if(horaAcesso <= 18 && horaAcesso >= 20) {
+  if(horaAcesso >= 18 && horaAcesso <= 20) {
     std::cout << "Horário de pico. Acesso bloqueado!" << std::endl;
     return false;
   }
