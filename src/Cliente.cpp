@@ -14,6 +14,11 @@ Cliente::Cliente(const std::string& nome,
 
 void Cliente::associarTreino(Treino* treino)
 {
+    if (treino == nullptr)
+    {
+        throw AcademiaException("Treino invalido.");
+    }
+
     treinoDesignado = treino;
 }
 

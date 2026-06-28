@@ -22,6 +22,9 @@ class Instrutor : public Pessoa
               const std::string& cref,
               const std::string& especialidade);
 
+        void adicionarAlunoSupervisionado(Cliente* aluno);
+        void removerAlunoSupervisionado(Cliente* aluno);
+        bool supervisionaAluno(Cliente* aluno) const;
         void prescreverTreino(Cliente* aluno, Treino* novoTreino);
 
         std::string getCref() const;
