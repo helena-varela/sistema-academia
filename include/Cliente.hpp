@@ -28,6 +28,11 @@ class Cliente : public Pessoa
 
         void associarTreino(Treino* treino);
 
+        void setNome(const std::string& nome);
+        void setCPF(const std::string& cpf);
+        void setEmail(const std::string& email);
+        void setPlano(Plano* plano);
+
         Plano* getPlanoAtual() const;
 
         Treino* getTreinoDesignado() const;

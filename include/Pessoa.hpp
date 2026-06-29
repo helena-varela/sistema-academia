@@ -10,7 +10,6 @@ class Pessoa {
         std::string cpf;
         std::string email;
 
-    private:
         bool validarCPF(const std::string& cpf) const;
 
     public:

@@ -27,6 +27,11 @@ class Instrutor : public Pessoa
         bool supervisionaAluno(Cliente* aluno) const;
         void prescreverTreino(Cliente* aluno, Treino* novoTreino);
 
+        void setNome(const std::string& nome);
+        void setCPF(const std::string& cpf);
+        void setEmail(const std::string& email);
+        void setEspecialidade(const std::string& especialidade);
+
         std::string getCref() const;
         std::string getEspecialidade() const;
         std::list<Cliente*> getAlunosSobSupervisao() const;

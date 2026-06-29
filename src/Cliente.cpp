@@ -26,6 +26,46 @@ void Cliente::associarTreino(Treino* treino)
     treinoDesignado = treino;
 }
 
+void Cliente::setNome(const std::string& nome)
+{
+    if (nome.empty())
+    {
+        throw AcademiaException("Nome nao pode ser vazio.");
+    }
+
+    this->nome = nome;
+}
+
+void Cliente::setCPF(const std::string& cpf)
+{
+    if (!validarCPF(cpf))
+    {
+        throw AcademiaException("CPF invalido.");
+    }
+
+    this->cpf = cpf;
+}
+
+void Cliente::setEmail(const std::string& email)
+{
+    if (email.empty())
+    {
+        throw AcademiaException("Email nao pode ser vazio.");
+    }
+
+    this->email = email;
+}
+
+void Cliente::setPlano(Plano* plano)
+{
+    if (plano == nullptr)
+    {
+        throw AcademiaException("Plano invalido.");
+    }
+
+    planoAtual = plano;
+}
+
 Plano* Cliente::getPlanoAtual() const
 {
     return planoAtual;
