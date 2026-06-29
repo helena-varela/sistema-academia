@@ -32,6 +32,46 @@ void Instrutor::prescreverTreino(Cliente* aluno, Treino* novoTreino)
     aluno->associarTreino(novoTreino);
 }
 
+void Instrutor::setNome(const std::string& nome)
+{
+    if (nome.empty())
+    {
+        throw AcademiaException("Nome nao pode ser vazio.");
+    }
+
+    this->nome = nome;
+}
+
+void Instrutor::setCPF(const std::string& cpf)
+{
+    if (!validarCPF(cpf))
+    {
+        throw AcademiaException("CPF invalido.");
+    }
+
+    this->cpf = cpf;
+}
+
+void Instrutor::setEmail(const std::string& email)
+{
+    if (email.empty())
+    {
+        throw AcademiaException("Email nao pode ser vazio.");
+    }
+
+    this->email = email;
+}
+
+void Instrutor::setEspecialidade(const std::string& especialidade)
+{
+    if (especialidade.empty())
+    {
+        throw AcademiaException("Especialidade nao pode ser vazia.");
+    }
+
+    this->especialidade = especialidade;
+}
+
 void Instrutor::adicionarAlunoSupervisionado(Cliente* aluno)
 {
     if (aluno == nullptr)
