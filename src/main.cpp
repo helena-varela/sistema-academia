@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../include/AcademiaException.hpp"
 #include "../include/GerenciadorAcademia.hpp"
-
+#include "../include/Interface.hpp"
 using namespace std;
 
 int main()
@@ -10,10 +10,11 @@ int main()
 
     bool executando = true;
     int opcao;
+    string cpf;
 
     try
     {
-        // gerenciador.carregarDeArquivo();
+        gerenciador.carregarDeArquivo("backup.txt");
 
         while (executando)
         {
@@ -31,18 +32,28 @@ int main()
             switch (opcao)
             {
                 case 1:
-                    cout << "[Interface do Cliente]" << endl;
-                    // interfaceCliente();
-                    break;
-
+                    {
+                        cout << "[Interface do Cliente]" << endl;
+                        cout << "Digite seu CPF: " << endl;
+                        cin >> cpf;
+                        Cliente* cliente = gerenciador.consultarCliente(cpf);
+                        interfaceCliente(*cliente);
+                        break;
+                    }
                 case 2:
-                    cout << "[Interface do Instrutor]" << endl;
-                    // interfaceInstrutor();
-                    break;
-
+                    {
+                        cout << "[Interface do Instrutor]" << endl;
+                        cout << "Digite seu CPF: " << endl;
+                        cin >> cpf;
+                        {
+                            //Instrutor* instrutor = gerenciador.consultarInstrutor(cpf); //criar função
+                            //interfaceInstrutor(gerenciador, instrutor);
+                        }
+                        break;
+                    }
                 case 3:
                     cout << "[Interface do Gerenciador]" << endl;
-                    // interfaceGerenciador();
+                    interfaceGerenciador(gerenciador);
                     break;
 
                 case 0:
@@ -55,7 +66,7 @@ int main()
             }
         }
 
-        // gerenciador.salvarEmArquivo();
+        gerenciador.salvarEmArquivo("backup.txt");
     }
     catch (const AcademiaException& e)
     {

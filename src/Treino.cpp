@@ -23,14 +23,27 @@ Treino::Treino(std::string focoMuscular, std::list<std::string> exercicios, int 
 
 
 // getters
-std::string Treino::getFoco(){
+std::string Treino::getFoco() const{
     return this -> focoMuscular;
 };
 
-std::list<std::string> Treino::getExercicios(){
+std::list<std::string> Treino::getExercicios() const{
     return this -> exercicios;
 }
 
-int Treino::getDuracao(){
+int Treino::getDuracao() const{
     return this -> duracaoEstimadaMin;
+}
+
+std::ostream& operator<<(std::ostream& os, const Treino& treino)
+{
+    os << "Foco: " << treino.getFoco() << '\n';
+    os << "Exercicios:\n";
+
+    for (const std::string& exercicio : treino.getExercicios())
+    {
+        os << "- " << exercicio << '\n';
+    }
+
+    return os;
 }

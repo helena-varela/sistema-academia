@@ -1,5 +1,6 @@
 #ifndef PLANO_HPP
 #define PLANO_HPP
+#include <string>
 
 class Plano 
 {
@@ -9,6 +10,7 @@ class Plano
         Plano(double precoBase);
         virtual double calcularMensalidade() = 0;
         virtual bool aplicarRestricaoAcesso(int horaAcesso) = 0;
+        virtual std::string getTipoPlano() const = 0;
         virtual ~Plano();
 };
 

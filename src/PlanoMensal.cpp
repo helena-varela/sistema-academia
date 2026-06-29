@@ -19,3 +19,8 @@ bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
   }
   return true;
 }
+
+std::string PlanoMensal::getTipoPlano() const
+{
+  return "Plano Mensal";
+}
