@@ -1,5 +1,6 @@
 #ifndef PLANO_HPP
 #define PLANO_HPP
+#include <string>
 
 class Plano 
 {

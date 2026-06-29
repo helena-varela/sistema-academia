@@ -46,7 +46,7 @@ void GerenciadorAcademia::atualizarCliente(const std::string& cpf, Cliente* novo
 
 void GerenciadorAcademia::removerCliente(const std::string& cpf)
 {
-  for(int i = 0; i < clientes.size();i++) {
+  for(size_t i = 0; i < clientes.size();i++) {
     if(clientes[i]->getCpf() == cpf){
       delete clientes[i];
       clientes.erase(clientes.begin() + i);

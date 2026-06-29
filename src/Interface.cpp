@@ -1,7 +1,14 @@
 #include "../include/Interface.hpp"
 #include <iostream>
-
-using namespace std;
+#include <limits>
+using std::cin;
+using std::cout;
+using std::endl;
+using std::getline;
+using std::list;
+using std::numeric_limits;
+using std::streamsize;
+using std::string;
 
 void interfaceCliente(Cliente& cliente)
 {
@@ -71,6 +78,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
         switch (opcao)
         {
             case 1:
+            {
                 cout << "====== Painel de Busca ======" << endl;
                 cout << "Digite o id do aluno que deseja supervisionar: ";
                 cin >> id;
@@ -92,6 +100,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 }
                 cout << "=========================" << endl;
                 break;
+            }
             case 2:
             {
                 int codigo;
@@ -232,15 +241,17 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     break;
                 }
             case 2:
-                cout << "====== Painel de Consulta (Cliente) ======" << endl;
-                cout << "Digite o id do aluno que deseja consultar: ";
-                cin >> id;
-                Cliente* cliente = gerenciador.consultarClienteBase(id);
-                cout << "Nome: " << cliente->getNome() << endl;
-                cout << "CPF: " << cliente->getCpf() << endl;
-                cout << "E-mail: " << cliente->getEmail() << endl;
-                cout << "=========================" << endl; 
-                break;
+                {
+                    cout << "====== Painel de Consulta (Cliente) ======" << endl;
+                    cout << "Digite o id do aluno que deseja consultar: ";
+                    cin >> id;
+                    Cliente* cliente = gerenciador.consultarClienteBase(id);
+                    cout << "Nome: " << cliente->getNome() << endl;
+                    cout << "CPF: " << cliente->getCpf() << endl;
+                    cout << "E-mail: " << cliente->getEmail() << endl;
+                    cout << "=========================" << endl; 
+                    break;
+                }
             case 3:
                 {
                     int escolha;
@@ -377,7 +388,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "Digite a especialidade: ";
                     getline(cin, especialidade);
 
-                    Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
+                    //Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
                     //gerenciador.cadastrarInstrutor(i); //criar método
 
                     cout << "Instrutor cadastrado!" << endl;

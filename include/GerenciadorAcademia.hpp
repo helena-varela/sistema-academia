@@ -18,7 +18,7 @@ class GerenciadorAcademia
     public:
         void cadastrarCliente(Cliente* c);
         Cliente* consultarCliente(const std::string& cpf);
-        Cliente* GerenciadorAcademia::consultarClienteBase(const int& codigoMatricula);
+        Cliente* consultarClienteBase(const int& codigoMatricula);
         void atualizarCliente(const std::string& cpf, Cliente* novoC);
         void removerCliente(const std::string& cpf);
         void salvarEmArquivo(std::string nomeArquivo);

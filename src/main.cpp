@@ -32,23 +32,25 @@ int main()
             switch (opcao)
             {
                 case 1:
-                    cout << "[Interface do Cliente]" << endl;
-                    cout << "Digite seu CPF: " << endl;
-                    cin >> cpf;
-                    Cliente* cliente = gerenciador.consultarCliente(cpf);
-                    interfaceCliente(*cliente);
-                    break;
-
-                case 2:
-                    cout << "[Interface do Instrutor]" << endl;
-                    cout << "Digite seu CPF: " << endl;
-                    cin >> cpf;
                     {
-                        Instrutor* instrutor = gerenciador.consultarInstrutor(cpf); //criar função
-                        interfaceInstrutor(gerenciador, instrutor);
+                        cout << "[Interface do Cliente]" << endl;
+                        cout << "Digite seu CPF: " << endl;
+                        cin >> cpf;
+                        Cliente* cliente = gerenciador.consultarCliente(cpf);
+                        interfaceCliente(*cliente);
+                        break;
                     }
-                    break;
-
+                case 2:
+                    {
+                        cout << "[Interface do Instrutor]" << endl;
+                        cout << "Digite seu CPF: " << endl;
+                        cin >> cpf;
+                        {
+                            //Instrutor* instrutor = gerenciador.consultarInstrutor(cpf); //criar função
+                            //interfaceInstrutor(gerenciador, instrutor);
+                        }
+                        break;
+                    }
                 case 3:
                     cout << "[Interface do Gerenciador]" << endl;
                     interfaceGerenciador(gerenciador);
