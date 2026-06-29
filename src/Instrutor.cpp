@@ -120,3 +120,10 @@ std::list<Cliente*> Instrutor::getAlunosSobSupervisao() const
 {
     return alunosSobSupervisao;
 }
+
+bool Instrutor::ValidarEntrada() const
+{
+    return Pessoa::ValidarEntrada() &&
+           !cref.empty() &&
+           !especialidade.empty();
+}

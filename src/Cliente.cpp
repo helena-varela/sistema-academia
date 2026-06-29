@@ -81,6 +81,12 @@ int Cliente::getCodigoMatricula() const
     return matricula.getCodigoMatricula();
 }
 
+bool Cliente::ValidarEntrada() const
+{
+    return Pessoa::ValidarEntrada() &&
+           planoAtual != nullptr;
+}
+
 std::ostream& operator<<(std::ostream& os, const Cliente& cliente)
 {
     os << cliente.getNome() << ';'
