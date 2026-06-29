@@ -1,5 +1,6 @@
 #include "GerenciadorAcademia.hpp"
 #include <fstream>
+#include <iostream>
 
 void GerenciadorAcademia::cadastrarCliente(Cliente* c)
 {
@@ -9,6 +10,7 @@ void GerenciadorAcademia::cadastrarCliente(Cliente* c)
     }
   } 
   clientes.push_back(c);
+  std::cout << "Cliente cadastrado com sucesso!" << std::endl;
   return;
 }
 
@@ -26,7 +28,9 @@ void GerenciadorAcademia::atualizarCliente(const std::string& cpf, Cliente* novo
 {
   for(Cliente*& clienteAtual : clientes) {
     if(clienteAtual->getCpf() == cpf) {
+      delete clienteAtual;
       clienteAtual = novoC;
+      std::cout << "Cliente atualizado com sucesso!" << std::endl;
       return;
     }
   }
@@ -39,6 +43,7 @@ void GerenciadorAcademia::removerCliente(const std::string& cpf)
     if(clientes[i]->getCpf() == cpf){
       delete clientes[i];
       clientes.erase(clientes.begin() + i);
+      std::cout << "Cliente removido com sucesso!" << std::endl;
       return;
     }
   }
@@ -58,7 +63,6 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
   }
 
   arquivo.close();
-
 }
 
 
