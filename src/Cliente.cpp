@@ -98,10 +98,15 @@ std::istream& operator>>(std::istream& is, Cliente& cliente)
     std::string email;
     std::string codigo;
 
-    std::getline(is, nome, ';');
-    std::getline(is, cpf, ';');
-    std::getline(is, email, ';');
-    std::getline(is, codigo);
+    if (std::getline(is, nome, ';') &&
+        std::getline(is, cpf, ';') &&
+        std::getline(is, email, ';') &&
+        std::getline(is, codigo))
+    {
+        cliente.setNome(nome);
+        cliente.setCPF(cpf);
+        cliente.setEmail(email);
+    }
 
     return is;
 }
