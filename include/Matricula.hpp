@@ -16,11 +16,11 @@ class Matricula
     private:
         static int ultimoCodigo;
         int codigoMatricula;
-        StatusMatricula statusAtual; //Aqui era pra ser um enum, suponho
-        std::string dataInicio; //da pra formatar acho
+        StatusMatricula statusAtual; 
+        std::string dataInicio; 
     public:
         Matricula(std::string dataInicio);
-        void alterarEstado(StatusMatricula novoEstado); //aplicar Enum class
+        void alterarEstado(StatusMatricula novoEstado); 
         bool validarTransicao(StatusMatricula statusAtual, StatusMatricula novoEstado);
         int getCodigoMatricula() const;
         StatusMatricula getStatus() const;

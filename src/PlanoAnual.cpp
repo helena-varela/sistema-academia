@@ -16,3 +16,8 @@ bool PlanoAnual::aplicarRestricaoAcesso(int horaAcesso) {
   std::cout << "Plano Anual. Acesso liberado!";
   return true;
 }
+
+std::string PlanoAnual::getTipoPlano() const
+{
+  return "Plano Anual";
+}

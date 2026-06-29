@@ -7,6 +7,7 @@
 #include "Pessoa.hpp"
 #include "Cliente.hpp"
 #include "Treino.hpp"
+#include "AcademiaException.hpp"
 
 class Instrutor : public Pessoa
 {
@@ -21,9 +22,20 @@ class Instrutor : public Pessoa
               const std::string& cref,
               const std::string& especialidade);
 
+        void adicionarAlunoSupervisionado(Cliente* aluno);
+        void removerAlunoSupervisionado(Cliente* aluno);
+        bool supervisionaAluno(Cliente* aluno) const;
         void prescreverTreino(Cliente* aluno, Treino* novoTreino);
+
+        void setNome(const std::string& nome);
+        void setCPF(const std::string& cpf);
+        void setEmail(const std::string& email);
+        void setEspecialidade(const std::string& especialidade);
 
         std::string getCref() const;
         std::string getEspecialidade() const;
+        std::list<Cliente*> getAlunosSobSupervisao() const;
+
+        bool ValidarEntrada() const override;
 };
 #endif // INSTRUTOR_HPP

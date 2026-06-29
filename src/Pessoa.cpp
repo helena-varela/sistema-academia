@@ -10,6 +10,16 @@ Pessoa::Pessoa(const std::string& nome,
       cpf(cpf),
       email(email)
 {
+    if (nome.empty())
+    {
+        throw AcademiaException("Nome nao pode ser vazio.");
+    }
+
+    if (email.empty())
+    {
+        throw AcademiaException("Email nao pode ser vazio.");
+    }
+
     if (!validarCPF(cpf))
     {
         throw AcademiaException("CPF inválido.");
@@ -33,6 +43,13 @@ std::string Pessoa::getCpf() const
 std::string Pessoa::getEmail() const
 {
     return email;
+}
+
+bool Pessoa::ValidarEntrada() const
+{
+    return !nome.empty() &&
+           !email.empty() &&
+           validarCPF(cpf);
 }
 
 bool Pessoa::validarCPF(const std::string& cpf) const
