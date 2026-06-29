@@ -21,6 +21,8 @@ class Pessoa {
         std::string getCpf() const;
         std::string getEmail() const;
 
+        virtual bool ValidarEntrada() const;
+
         virtual ~Pessoa() = 0;
 };
 

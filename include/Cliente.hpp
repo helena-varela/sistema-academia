@@ -39,6 +39,8 @@ class Cliente : public Pessoa
 
         int getCodigoMatricula() const;
 
+        bool ValidarEntrada() const override;
+
         // void consultarCliente(std::string cpf);
 
         friend std::ostream& operator<<(std::ostream& os, const Cliente& cliente);

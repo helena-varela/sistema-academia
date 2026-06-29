@@ -45,6 +45,13 @@ std::string Pessoa::getEmail() const
     return email;
 }
 
+bool Pessoa::ValidarEntrada() const
+{
+    return !nome.empty() &&
+           !email.empty() &&
+           validarCPF(cpf);
+}
+
 bool Pessoa::validarCPF(const std::string& cpf) const
 {
     if (cpf.length() != 11)
