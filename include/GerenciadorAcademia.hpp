@@ -5,6 +5,9 @@
 #include <vector>
 #include "Instrutor.hpp"
 #include "Cliente.hpp"
+#include "Plano.hpp"
+#include "PlanoMensal.hpp"
+#include "PlanoAnual.hpp"
 #include "AcademiaException.hpp"
 
 class GerenciadorAcademia
@@ -15,6 +18,7 @@ class GerenciadorAcademia
     public:
         void cadastrarCliente(Cliente* c);
         Cliente* consultarCliente(const std::string& cpf);
+        Cliente* GerenciadorAcademia::consultarClienteBase(const int& codigoMatricula);
         void atualizarCliente(const std::string& cpf, Cliente* novoC);
         void removerCliente(const std::string& cpf);
         void salvarEmArquivo(std::string nomeArquivo);

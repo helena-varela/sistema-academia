@@ -22,6 +22,17 @@ Cliente* GerenciadorAcademia::consultarCliente(const std::string& cpf)
   throw AcademiaException("Erro: Cliente não cadastrado!");
 }
 
+
+Cliente* GerenciadorAcademia::consultarClienteBase(const int& codigoMatricula)
+{
+  for(Cliente* clienteAtual : clientes) {
+    if(clienteAtual->getCodigoMatricula() == codigoMatricula){
+      return clienteAtual;
+    }
+  }
+  throw AcademiaException("Erro: Cliente não cadastrado!");
+}
+
 void GerenciadorAcademia::atualizarCliente(const std::string& cpf, Cliente* novoC)
 {
   for(Cliente*& clienteAtual : clientes) {

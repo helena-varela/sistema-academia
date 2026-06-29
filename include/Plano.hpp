@@ -9,6 +9,7 @@ class Plano
         Plano(double precoBase);
         virtual double calcularMensalidade() = 0;
         virtual bool aplicarRestricaoAcesso(int horaAcesso) = 0;
+        virtual std::string getTipoPlano() const = 0;
         virtual ~Plano();
 };
 
