@@ -8,7 +8,6 @@
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
-#include "Pessoa.hpp"
 #include "AcademiaException.hpp"
 
 class Cliente : public Pessoa
@@ -40,6 +39,9 @@ class Cliente : public Pessoa
         int getCodigoMatricula() const;
 
         bool ValidarEntrada() const override;
+
+        void restaurarMatricula(int codigo, const std::string& data);
+        std::string getDataInicio() const;
 
         // void consultarCliente(std::string cpf);
 

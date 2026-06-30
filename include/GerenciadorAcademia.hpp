@@ -31,6 +31,7 @@ class GerenciadorAcademia
         void cadastrarInstrutor(Instrutor* i);
         void removerInstrutor(const std::string& cpf);
         Instrutor* consultarInstrutor(const std::string& cref);
+        Instrutor* consultarInstrutorPorCpf(const std::string& cpf);
         void cadastrarTreino(Treino* t);
         
         // salvar e carregar arquivos

@@ -1,2 +1,6 @@
 PLANO;Plano Mensal;115
 PLANO;Plano Anual;79.9
+TREINO;Treino Geral;50;Supino Reto|Agachamento Livre|Corrida
+TREINO;cabeçca;30;correr|bater
+INSTRUTOR;10020030045;sergio;treino@sergio.com;01002451450;musculo
+CLIENTE;1;01/01/2026;Kauã;70099587424;kaua@game.com;Plano Mensal;cabeçca;10020030045

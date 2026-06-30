@@ -10,10 +10,15 @@ Cliente::Cliente(const std::string& nome,
       treinoDesignado(nullptr),
       matricula(dataInicio)
 {
+    if(plano == nullptr) {
+        throw AcademiaException("Cliente nao pode ser cadatrado sem um plano valido.");
+    }
 }
 
 Cliente::~Cliente()
 {
+    delete planoAtual;
+    delete treinoDesignado;
 }
 
 void Cliente::associarTreino(Treino* treino)
@@ -22,7 +27,7 @@ void Cliente::associarTreino(Treino* treino)
     {
         throw AcademiaException("Treino invalido.");
     }
-
+    delete treinoDesignado;
     treinoDesignado = treino;
 }
 
@@ -62,7 +67,7 @@ void Cliente::setPlano(Plano* plano)
     {
         throw AcademiaException("Plano invalido.");
     }
-
+    delete planoAtual;
     planoAtual = plano;
 }
 
@@ -115,4 +120,12 @@ std::istream& operator>>(std::istream& is, Cliente& cliente)
     }
 
     return is;
+}
+
+void Cliente::restaurarMatricula(int codigo, const std::string& data){
+    matricula.setCodigoEData(codigo, data);
+}
+
+std::string Cliente::getDataInicio() const {
+    return matricula.getDataInicio();
 }

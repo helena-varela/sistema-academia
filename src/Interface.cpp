@@ -208,6 +208,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
 {
     int opcao;
     int id;
+    string cpf;
 
     do{
     cout << "====== Bem-vindo Gerenciador ======" << endl;
@@ -251,16 +252,15 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     gerenciador.cadastrarCliente(c);
 
                     cout << "Cliente cadastrado!" << endl;
-                    break;
                     cout << "=========================" << endl;
                     break;
                 }
             case 2:
                 {
                     cout << "====== Painel de Consulta (Cliente) ======" << endl;
-                    cout << "Digite o id do aluno que deseja consultar: ";
-                    cin >> id;
-                    Cliente* cliente = gerenciador.consultarClienteBase(id);
+                    cout << "Digite o cpf do aluno que deseja consultar: ";
+                    cin >> cpf;
+                    Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
                     cout << "CPF: " << cliente->getCpf() << endl;
                     cout << "E-mail: " << cliente->getEmail() << endl;
@@ -271,9 +271,9 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 {
                     int escolha;
                     cout << "====== Painel de Atualizacao (Cliente) ======" << endl;
-                    cout << "Digite o id do aluno que deseja atualizar: ";
-                    cin >> id;
-                    Cliente* cliente = gerenciador.consultarClienteBase(id);
+                    cout << "Digite o cpf do aluno que deseja atualizar: ";
+                    cin >> cpf;
+                    Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
                     cout << "CPF: " << cliente->getCpf() << endl;
                     cout << "E-mail: " << cliente->getEmail() << endl;  
@@ -312,6 +312,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                 {
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
+                                    cin >> cpfNovo;
                                     cliente->setCPF(cpfNovo);  
                                     break;
                                 }
@@ -386,9 +387,9 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 {
                     int escolha;
                     cout << "====== Painel de Remocao (Cliente) ======" << endl;
-                    cout << "Digite o id do aluno que deseja remover: ";
-                    cin >> id;
-                    Cliente* cliente = gerenciador.consultarClienteBase(id);
+                    cout << "Digite o cpf do aluno que deseja remover: ";
+                    cin >> cpf;
+                    Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
                     cout << "CPF: " << cliente->getCpf() << endl;
                     cout << "E-mail: " << cliente->getEmail() << endl;  
@@ -428,7 +429,6 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     gerenciador.cadastrarInstrutor(i); 
 
                     cout << "Instrutor cadastrado!" << endl;
-                    break;
                     cout << "=========================" << endl;
                     break;
                 }
@@ -490,6 +490,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                 {
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
+                                    cin >> cpfNovo;
                                     instrutor->setCPF(cpfNovo);  
                                     break;
                                 }

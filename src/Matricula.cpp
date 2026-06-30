@@ -24,7 +24,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
 {
     if (atual == novoEstado) //Não é permitido o mesmo estado
     {
-        throw AcademiaException("Esse já é o estado atual da Matrícula");
+        throw AcademiaException("Esse ja e o estado atual da Matrícula");
     }
     switch (atual)
     {
@@ -47,7 +47,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
             } 
             break;
     }
-    throw AcademiaException("Transição de estado inválida.");
+    throw AcademiaException("Transição de estado invalida.");
 }
 
 StatusMatricula Matricula::getStatus() const //getter de status
@@ -58,4 +58,16 @@ StatusMatricula Matricula::getStatus() const //getter de status
 int Matricula::getCodigoMatricula() const //getter do código ID
 {
     return codigoMatricula;
+}
+
+void Matricula::setCodigoEData(int codigo, const std::string& data){
+    codigoMatricula = codigo;
+    dataInicio = data;
+    if(codigo > ultimoCodigo){
+        ultimoCodigo = codigo;
+    }
+}
+
+std::string Matricula::getDataInicio() const {
+    return dataInicio;
 }

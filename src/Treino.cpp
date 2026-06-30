@@ -2,7 +2,7 @@
 #include <iostream>
 
 // construtor
-Treino::Treino(std::string focoMuscular, std::list<std::string> exercicios, int duracaoEstimadaMin){
+Treino::Treino(std::string focoMuscular, const std::list<std::string>& exercicios, int duracaoEstimadaMin){
     // 1º regras de negócio: a lista de exercícios não pode estar vazia
     if (exercicios.empty())
     {
