@@ -61,107 +61,81 @@ Contém os arquivos de extensão .cpp com a implementação real da lógica decl
 
 ```mermaid
 classDiagram
-    direction OA
-    
-    %% --- RELAÇÕES ---
-    Pessoa <|-- Cliente
-    Pessoa <|-- Instrutor
-    Plano <|-- PlanoMensal
-    Plano <|-- PlanoAnual
-    Cliente *-- Matricula
-    Cliente o-- Treino
-    Instrutor o-- Cliente
-    GerenciadorAcademia ..> Pessoa : Gerencia (CRUD)
-    GerenciadorAcademia ..> AcademiaException : Lança
-
-    %% --- CLASSES ---
+direction BT
     class Pessoa {
-        <<Abstract>>
-        # string nome
-        # string cpf
-        # string email
-        + Pessoa(string nome, string cpf, string email)
-        + ~Pessoa()*
-        + getNome() string
-        + getCpf() string
-    }
-
-    class Cliente {
-        - string codigoMatricula
-        - Plano* planoAtual
-        - Treino* treinoDesignado
-        + Cliente(string nome, string cpf, string email, Plano* plano)
-        + associarTreino(Treino* t) void
-        + getPlanoAtual() Plano*
-        + operator~plus~~plus~(ostream& os, const Cliente& c)$ void
-        + operator~greater~~greater~(istream& is, Cliente& c)$ void
-    }
-
-    class Instrutor {
-        - string cref
-        - string especialidade
-        - list~Cliente*~ alunosSobSupervisao
-        + Instrutor(string nome, string cpf, string email, string cref, string esp)
-        + prescreverTreino(Cliente* aluno, Treino* novoTreino) void
+	    #String nome
+	    #String cpf
+	    #String email
     }
 
     class Plano {
-        <<Abstract>>
-        # double precoBase
-        + Plano(double preco)
-        + ~Plano()*
-        + calcularMensalidade()* double
-        + aplicarRestricaoAcesso(string horaAcesso)* bool
+	    #double precoBase
     }
 
     class PlanoMensal {
-        - double taxaInscricaoAvulsa
-        + PlanoMensal(double preco, double taxa)
-        + calcularMensalidade() double
-        + aplicarRestricaoAcesso(string horaAcesso) bool
+	    -double taxaInscricaoAvulsa
     }
 
     class PlanoAnual {
-        - int mesesFidelidade
-        - double descontoFidelidade
-        + PlanoAnual(double preco, int meses, double desc)
-        + calcularMensalidade() double
-        + aplicarRestricaoAcesso(string horaAcesso) bool
+	    -int mesesFidelidade
+	    -double descontoFidelidade
+    }
+
+    class Instrutor {
+	    -String cref
+	    -String especialidade
+    }
+
+    class Cliente {
+	    -Plano* planoAtual
+	    -Treino* treinoDesignado
     }
 
     class Treino {
-        - string focoMuscular
-        - list~string~ exercicios
-        - int duracaoEstimadaMin
-        + Treino(string foco, list~string~ ex, int duracao)
-        + getFoco() string
+	    -String focoMuscular
+	    -List~String~ exercicios
+	    -int duracaoEstimadaMin
     }
 
     class Matricula {
-        %% Estado Dinâmico
-        - string statusAtual
-        - string dataInicio
-        + Matricula(string data)
-        + alterarEstado(string novoEstado) void
-        + validarTransicao(string atual, string novo) bool
-        + getStatus() string
+	    -int ultimoCodigo$
+	    -int codigoMatricula
+	    -String dataInicio
+    }
+
+    class StatusMatricula {
+	    ATIVA
+	    INADIMPLENTE
+	    TRANCADA
     }
 
     class GerenciadorAcademia {
-        - vector~Cliente*~ clientes
-        - vector~Instrutor*~ instrutores
-        + cadastrarCliente(Cliente* c) void
-        + consultarCliente(string cpf) Cliente*
-        + atualizarCliente(string cpf, Cliente* novoC) void
-        + removerCliente(string cpf) void
-        + salvarEmArquivo(string nomeArq) void
-        + carregarDeArquivo(string nomeArq) void
+	    -Vector~Cliente*~ clientes
+	    -Vector~Instrutor*~ instrutores
+	    -Vector~Plano*~ planosCadastrados
+	    -Vector~Treino*~ treinosCadastrados
     }
 
     class AcademiaException {
-        - string mensagemErro
-        + AcademiaException(string msg)
-        + what() const char*
+	    -String mensagemErro
     }
+
+	<<abstract>> Pessoa
+	<<abstract>> Plano
+	<<enumeration>> StatusMatricula
+
+    Pessoa <|-- Instrutor
+    Pessoa <|-- Cliente
+    Plano <|-- PlanoMensal
+    Plano <|-- PlanoAnual
+    Cliente "1" *-- "1" Matricula : possui
+    Matricula "1" *-- "1" StatusMatricula : tem
+    Instrutor "1" o-- "0..*" Cliente : supervisiona
+    Cliente "0..*" o-- "0..1" Plano : assina
+    Cliente "0..*" o-- "0..1" Treino : realiza
+    GerenciadorAcademia "1" *-- "0..*" Cliente : gerencia
+    GerenciadorAcademia "1" *-- "0..*" Instrutor : gerencia
+    GerenciadorAcademia "1" *-- "0..*" Plano : cadastra
+    GerenciadorAcademia "1" *-- "0..*" Treino : armazena
 ```
 <!-- <img width="7637" height="8192" alt="Cliente Management Framework-2026-06-17-013321" src="https://github.com/user-attachments/assets/66b8d54f-1f82-4c84-b334-e11a5d0b07be" /> -->
