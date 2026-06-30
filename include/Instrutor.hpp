@@ -22,6 +22,7 @@ class Instrutor : public Pessoa
               const std::string& cref,
               const std::string& especialidade);
 
+        Cliente* consultarAlunoSupervisionado(int codigoMatricula) const;
         void adicionarAlunoSupervisionado(Cliente* aluno);
         void removerAlunoSupervisionado(Cliente* aluno);
         bool supervisionaAluno(Cliente* aluno) const;

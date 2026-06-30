@@ -127,3 +127,15 @@ bool Instrutor::ValidarEntrada() const
            !cref.empty() &&
            !especialidade.empty();
 }
+
+Cliente* Instrutor::consultarAlunoSupervisionado(int codigoMatricula) const
+{
+    for (Cliente* aluno : alunosSobSupervisao)
+    {
+        if (aluno->getCodigoMatricula() == codigoMatricula)
+        {
+            return aluno;
+        }
+    }
+    throw AcademiaException("Aluno nao esta sob supervisao deste instrutor.");
+}
