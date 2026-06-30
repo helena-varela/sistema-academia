@@ -14,7 +14,7 @@ int main()
 
     try
     {
-        gerenciador.carregarDeArquivo("backup.txt");
+        gerenciador.carregarDeArquivo("data/backup.txt");
 
         while (executando)
         {
@@ -43,11 +43,11 @@ int main()
                 case 2:
                     {
                         cout << "[Interface do Instrutor]" << endl;
-                        cout << "Digite seu CPF: " << endl;
+                        cout << "Digite seu CREF: " << endl;
                         cin >> cpf;
                         {
-                            //Instrutor* instrutor = gerenciador.consultarInstrutor(cpf); //criar função
-                            //interfaceInstrutor(gerenciador, instrutor);
+                            Instrutor* instrutor = gerenciador.consultarInstrutor(cpf);
+                            interfaceInstrutor(gerenciador, instrutor);
                         }
                         break;
                     }
@@ -66,7 +66,7 @@ int main()
             }
         }
 
-        gerenciador.salvarEmArquivo("backup.txt");
+        gerenciador.salvarEmArquivo("data/backup.txt");
     }
     catch (const AcademiaException& e)
     {

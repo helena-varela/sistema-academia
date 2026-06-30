@@ -9,13 +9,17 @@
 #include "PlanoMensal.hpp"
 #include "PlanoAnual.hpp"
 #include "AcademiaException.hpp"
+#include "Treino.hpp"
 
 class GerenciadorAcademia
 {
     private:
         std::vector<Cliente*> clientes;
         std::vector<Instrutor*> instrutores;
+        std::vector<Plano*> planosCadastrados;
+        std::vector<Treino*> treinosCadastrados;
     public:
+        GerenciadorAcademia();
         ~GerenciadorAcademia();
 
         void cadastrarCliente(Cliente* c);
@@ -27,10 +31,16 @@ class GerenciadorAcademia
         void cadastrarInstrutor(Instrutor* i);
         void removerInstrutor(const std::string& cpf);
         Instrutor* consultarInstrutor(const std::string& cref);
+        void cadastrarTreino(Treino* t);
         
+        // salvar e carregar arquivos
         void salvarEmArquivo(std::string nomeArquivo);
         void carregarDeArquivo(std::string nomeArquivo);
 
+        // funções de busca auxiliares
+        Plano* buscarPlano(const std::string& id);
+        Treino* buscarTreino(const std::string& id);
+        Instrutor* buscarInstrutor(const std::string& cpf);
 };
 
 #endif
