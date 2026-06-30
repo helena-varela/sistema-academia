@@ -33,19 +33,31 @@ void interfaceCliente(Cliente& cliente)
                 cout << "CPF: " << cliente.getCpf() << endl;
                 cout << "E-mail: " << cliente.getEmail() << endl;
                 cout << "=========================" << endl;
+                break;
             case 2:
                 cout << "====== Seu ID ======" << endl;
                 cout << "Matrícula: " << cliente.getCodigoMatricula() << endl;
-                cout << "=========================" << endl; 
+                cout << "=========================" << endl;
+                break;
             case 3:
                 cout << "====== Seu Plano Atual ======" << endl;
-                cout << "Plano: " << cliente.getPlanoAtual()->getTipoPlano() << endl;
+                if (cliente.getPlanoAtual() != nullptr) {
+                    cout << "Plano: " << cliente.getPlanoAtual()->getTipoPlano() << endl;
+                } else {
+                    cout << "Plano: Nenhum plano ativo ou cadastrado no sistema." << endl;
+                }
                 cout << "=========================" << endl; 
+                break;
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
-                cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
-                cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
-                cout << "=========================" << endl; 
+                if (cliente.getTreinoDesignado() != nullptr) {
+                    cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
+                    cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
+                } else {
+                    cout << "Treino: Voce ainda nao possui um treino designado por um instrutor." << endl;
+                }
+                cout << "=========================" << endl;
+                break;
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;
@@ -56,7 +68,7 @@ void interfaceCliente(Cliente& cliente)
     while (opcao != 0); 
 }
 
-void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
+void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
 {
     int opcao;
     int id;
@@ -95,7 +107,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 }
                 else if (escolha == 1)
                 {
-                    instrutor.adicionarAlunoSupervisionado(cliente);
+                    instrutor->adicionarAlunoSupervisionado(cliente);
                     cout << "Cliente Adicionado com Sucesso" << endl;
                 }
                 cout << "=========================" << endl;
@@ -106,7 +118,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 int codigo;
                 cout << "Informe o codigo da matricula: ";
                 cin >> codigo;
-                //Cliente* cliente = instrutor.consultarAlunoSupervisionado(codigo); //criar função
+                Cliente* cliente = instrutor->consultarAlunoSupervisionado(codigo); 
                 cin.ignore();
                 string foco;
                 cout << "Qual o foco do treino: ";
@@ -128,7 +140,10 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                     exercicios.push_back(exercicio);
                 }
                 Treino* treino = new Treino(foco, exercicios, duracao);
-                instrutor.prescreverTreino(cliente, treino);
+                instrutor->prescreverTreino(cliente, treino);
+            
+                gerenciador.cadastrarTreino(treino);
+
                 cout << "Treino prescrito com sucesso!" << endl;
                 cout << "=========================" << endl; 
                 break;
@@ -137,7 +152,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 cout << "====== Painel de Remocao ======" << endl;
                 cout << "Digite o id do aluno que deseja remover da supervisao: ";
                 cin >> id;
-                //cliente = instrutor.consultarAlunoSupervisionado(id); //criar função
+                cliente = instrutor->consultarAlunoSupervisionado(id); 
                 cout << "Nome: " << cliente->getNome() << endl;
                 cout << "E-mail: " << cliente->getEmail() << endl;
                 cout << "Esse e o cliente que deseja remover?" << endl;
@@ -150,7 +165,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 }
                 else if (escolha == 1)
                 {
-                    instrutor.removerAlunoSupervisionado(cliente);
+                    instrutor->removerAlunoSupervisionado(cliente);
                     cout << "Cliente Removido com Sucesso" << endl;
                 }
                 cout << "=========================" << endl; 
@@ -158,7 +173,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
             case 4:
                 {
                     cout << "====== Lista de Alunos Supervisionados ======" << endl;
-                    std::list<Cliente*> alunos = instrutor.getAlunosSobSupervisao();
+                    std::list<Cliente*> alunos = instrutor->getAlunosSobSupervisao();
 
                     if (alunos.empty())
                     {
@@ -289,7 +304,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        //cliente->setNome(nomeNovo);  Criar método
+                                        cliente->setNome(nomeNovo);  
                                     }
                                     break;
                                 }
@@ -297,7 +312,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                 {
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
-                                    //cliente->setCPF(cpfNovo);  Criar método (utilizando o validarcpf e lançando exceções)
+                                    cliente->setCPF(cpfNovo);  
                                     break;
                                 }
                             case 3:
@@ -312,7 +327,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        //cliente->setEmail(emailNovo);  Criar método
+                                        cliente->setEmail(emailNovo);  
                                     }
                                     break;
                                 }
@@ -328,15 +343,36 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
+                                        Plano* planoNovo = nullptr;
                                         if (planoNovoTipo == "Mensal")
                                         {
-                                            //
+                                            double preco, taxa;
+
+                                            cout << "Preco base: ";
+                                            cin >> preco;
+
+                                            cout << "Taxa de inscricao: ";
+                                            cin >> taxa;
+
+                                            planoNovo = new PlanoMensal(preco, taxa);
                                         }
                                         else if (planoNovoTipo == "Anual")
                                         {
-                                            //
+                                            double preco, desconto;
+                                            int meses;
+
+                                            cout << "Preco base: ";
+                                            cin >> preco;
+
+                                            cout << "Meses de fidelidade: ";
+                                            cin >> meses;
+
+                                            cout << "Desconto: ";
+                                            cin >> desconto;
+
+                                            planoNovo = new PlanoAnual(preco, meses, desconto);
                                         }
-                                        //cliente->setPlano(planoNovo);  Criar método
+                                        cliente->setPlano(planoNovo);  
                                     }
 
                                 }
@@ -388,8 +424,8 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "Digite a especialidade: ";
                     getline(cin, especialidade);
 
-                    //Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
-                    //gerenciador.cadastrarInstrutor(i); //criar método
+                    Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
+                    gerenciador.cadastrarInstrutor(i); 
 
                     cout << "Instrutor cadastrado!" << endl;
                     break;
@@ -402,9 +438,9 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Consulta (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja consultar: ";
                     cin >> cref;
-                    //Instrutor* instrutor = gerenciador.consultarInstrutor(cref); //criar metodo
-                    //cout << "Nome: " << instrutor->getNome() << endl;
-                   // cout << "E-mail: " << instrutor->getEmail() << endl;
+                    Instrutor* instrutor = gerenciador.consultarInstrutor(cref); 
+                    cout << "Nome: " << instrutor->getNome() << endl;
+                    cout << "E-mail: " << instrutor->getEmail() << endl;
                     cout << "=========================" << endl; 
                     break;
                 }
@@ -415,10 +451,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Atualizacao (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja atualizar: ";
                     cin >> cref;
-                    //Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
-                    //cout << "Nome: " << instrutor->getNome() << endl;
-                    //cout << "CPF: " << instrutor->getCpf() << endl;
-                    //cout << "E-mail: " << instrutor->getEmail() << endl; 
+                    Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
+                    cout << "Nome: " << instrutor->getNome() << endl;
+                    cout << "CPF: " << instrutor->getCpf() << endl;
+                    cout << "E-mail: " << instrutor->getEmail() << endl; 
                     cout << "Esse e o Instrutor que deseja atualizar?" << endl;
                     cout << "1. Sim" << endl;
                     cout << "2. Não" << endl;
@@ -446,7 +482,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        //Instrutor->setNome(nomeNovo);  Criar método
+                                        instrutor->setNome(nomeNovo);  
                                     }
                                     break;
                                 }
@@ -454,7 +490,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                 {
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
-                                    //Instrutor->setCPF(cpfNovo);  Criar método (utilizando o validarcpf e lançando exceções)
+                                    instrutor->setCPF(cpfNovo);  
                                     break;
                                 }
                             case 3:
@@ -469,7 +505,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        //Instrutor->setEmail(emailNovo);  Criar método
+                                        instrutor->setEmail(emailNovo);  
                                     }
                                     break;
                                 }
@@ -485,7 +521,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        //instrutor->setEspecialidade(especialidadeNova);  Criar método
+                                        instrutor->setEspecialidade(especialidadeNova);  
                                     }
 
                                 }
@@ -502,10 +538,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Remocao (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja remover: ";
                     cin >> cref;
-                    //Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
-                    //cout << "Nome: " << instrutor->getNome() << endl;
-                    //cout << "CPF: " << instrutor->getCpf() << endl;
-                    //cout << "E-mail: " << instrutor->getEmail() << endl; 
+                    Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
+                    cout << "Nome: " << instrutor->getNome() << endl;
+                    cout << "CPF: " << instrutor->getCpf() << endl;
+                    cout << "E-mail: " << instrutor->getEmail() << endl; 
                     cout << "Esse e o Instrutor que deseja remover?" << endl;
                     cout << "1. Sim" << endl;
                     cout << "2. Não" << endl;
@@ -516,7 +552,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     }
                     else if (escolha == 1)
                     {
-                        //gerenciador.removerInstrutor(instrutor->getCpf()); //criar metodo
+                        gerenciador.removerInstrutor(instrutor->getCpf()); 
                         cout << "Instrutor removido com sucesso" << endl;
                     }
                     cout << "=========================" << endl; 

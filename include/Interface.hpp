@@ -3,7 +3,7 @@
 #include "GerenciadorAcademia.hpp"
 
 void interfaceCliente(Cliente& cliente);
-void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor);
+void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor);
 void interfaceGerenciador(GerenciadorAcademia& gerenciador);
 
 #endif

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-
+#include <iostream>
 GerenciadorAcademia::GerenciadorAcademia()
 {
   planosCadastrados.push_back(new PlanoMensal(100.0, 15.0));
@@ -12,6 +12,20 @@ GerenciadorAcademia::GerenciadorAcademia()
   treinosCadastrados.push_back(new Treino("Treino Geral", exerciciosPadrao, 50));
 }
 
+GerenciadorAcademia::~GerenciadorAcademia()
+{
+  for(Cliente* c : clientes){
+    delete c;
+  }
+
+  for(Instrutor* i : instrutores){
+    delete i;
+  }
+  clientes.clear();
+  instrutores.clear();
+}
+
+// CRUD cliente
 void GerenciadorAcademia::cadastrarCliente(Cliente *c)
 {
   for (Cliente *clienteAtual : clientes)
@@ -22,6 +36,7 @@ void GerenciadorAcademia::cadastrarCliente(Cliente *c)
     }
   }
   clientes.push_back(c);
+  std::cout << "Cliente cadastrado com sucesso!" << std::endl;
   return;
 }
 
@@ -37,7 +52,7 @@ Cliente *GerenciadorAcademia::consultarCliente(const std::string &cpf)
   throw AcademiaException("Erro: Cliente não cadastrado!");
 }
 
-Cliente *GerenciadorAcademia::consultarClienteBase(const int &codigoMatricula)
+Cliente* GerenciadorAcademia::consultarClienteBase(int codigoMatricula)
 {
   for (Cliente *clienteAtual : clientes)
   {
@@ -51,11 +66,11 @@ Cliente *GerenciadorAcademia::consultarClienteBase(const int &codigoMatricula)
 
 void GerenciadorAcademia::atualizarCliente(const std::string &cpf, Cliente *novoC)
 {
-  for (Cliente *&clienteAtual : clientes)
-  {
-    if (clienteAtual->getCpf() == cpf)
-    {
+  for(Cliente*& clienteAtual : clientes) {
+    if(clienteAtual->getCpf() == cpf) {
+      delete clienteAtual;
       clienteAtual = novoC;
+      std::cout << "Cliente atualizado com sucesso!" << std::endl;
       return;
     }
   }
@@ -70,6 +85,7 @@ void GerenciadorAcademia::removerCliente(const std::string &cpf)
     {
       delete clientes[i];
       clientes.erase(clientes.begin() + i);
+      std::cout << "Cliente removido com sucesso!" << std::endl;
       return;
     }
   }
@@ -84,19 +100,6 @@ Plano *GerenciadorAcademia::buscarPlano(const std::string &id)
     if (plano->getTipoPlano() == id)
       return plano;
   }
-  return nullptr;
-}
-
-Instrutor *GerenciadorAcademia::descobrirInstrutorDoCliente(Cliente *c)
-{
-  for (auto *instrutor : instrutores)
-  {
-    if (instrutor->supervisionaAluno(c))
-    {
-      return instrutor;
-    }
-  }
-
   return nullptr;
 }
 
@@ -118,6 +121,49 @@ Instrutor *GerenciadorAcademia::buscarInstrutor(const std::string &cpf)
       return instrutor;
   }
   return nullptr;
+}
+
+// instrutor
+void GerenciadorAcademia::cadastrarInstrutor(Instrutor* i)
+{
+  for(Instrutor* instrutorAtual : instrutores){
+    if(i->getCpf() == instrutorAtual->getCpf()) {
+      throw AcademiaException("Erro: Instrutor com este CPF já cadastrado.");
+    }
+  } 
+  instrutores.push_back(i);
+  std::cout << "Instrutor cadastrado com sucesso!" << std::endl;
+  return;
+}
+
+void GerenciadorAcademia::removerInstrutor(const std::string& cpf)
+{
+  for(size_t i = 0; i < instrutores.size();i++) {
+    if(instrutores[i]->getCpf() == cpf){
+      delete instrutores[i];
+      instrutores.erase(instrutores.begin() + i);
+      std::cout << "Instrutor removido com sucesso!" << std::endl;
+      return;
+    }
+  }
+  throw AcademiaException("Erro: Instrutor não existe na base de dados!");
+}
+
+void GerenciadorAcademia::cadastrarTreino(Treino* t)
+{
+    if (t != nullptr) {
+        treinosCadastrados.push_back(t);
+    }
+}
+
+Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
+{
+  for(Instrutor* instrutorAtual : instrutores) {
+    if(instrutorAtual->getCref() == cref){
+      return instrutorAtual;
+    }
+  }
+  throw AcademiaException("Erro: Instrutor não cadastrado!");
 }
 
 // parte de arquivos
@@ -186,7 +232,6 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
   }
 
   arquivo.close();
-
 }
 
 
@@ -209,9 +254,6 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
   for (Treino *t : treinosCadastrados)
     delete t;
   treinosCadastrados.clear();
-  for (Plano *p : planosCadastrados)
-    delete p;
-  planosCadastrados.clear();
 
   std::string linha;
   // leitura do arquivo
@@ -226,19 +268,7 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
 
     if (tipo == "PLANO")
     {
-      std::string tipoPlano, precoStr;
-      std::getline(ss, tipoPlano, ';');
-      std::getline(ss, precoStr);
-      double preco = std::stod(precoStr);
-
-      if (tipoPlano == "MENSAL" || tipoPlano == "Plano Mensal")
-      {
-        planosCadastrados.push_back(new PlanoMensal(preco, 15.0));
-      }
-      else if (tipoPlano == "ANUAL" || tipoPlano == "Plano Anual")
-      {
-        planosCadastrados.push_back(new PlanoAnual(preco, 12, 0.1));
-      }
+      continue;
     }
     else if (tipo == "TREINO")
     {

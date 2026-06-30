@@ -1,0 +1,5 @@
+PLANO;Plano Mensal;115
+PLANO;Plano Anual;79.9
+TREINO;biceps;15;a|b|c
+INSTRUTOR;09876543210;joão;joao@email.com;12345;biceps
+CLIENTE;1;helena;12345678910;helena@email.com;Plano Mensal;biceps;09876543210

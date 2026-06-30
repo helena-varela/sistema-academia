@@ -18,15 +18,21 @@ class GerenciadorAcademia
         std::vector<Instrutor*> instrutores;
         std::vector<Plano*> planosCadastrados;
         std::vector<Treino*> treinosCadastrados;
-
-        Instrutor* descobrirInstrutorDoCliente(Cliente* c);
     public:
+        GerenciadorAcademia();
+        ~GerenciadorAcademia();
+
         void cadastrarCliente(Cliente* c);
         Cliente* consultarCliente(const std::string& cpf);
-        Cliente* consultarClienteBase(const int& codigoMatricula);
+        Cliente* consultarClienteBase(int codigoMatricula);
         void atualizarCliente(const std::string& cpf, Cliente* novoC);
         void removerCliente(const std::string& cpf);
 
+        void cadastrarInstrutor(Instrutor* i);
+        void removerInstrutor(const std::string& cpf);
+        Instrutor* consultarInstrutor(const std::string& cref);
+        void cadastrarTreino(Treino* t);
+        
         // salvar e carregar arquivos
         void salvarEmArquivo(std::string nomeArquivo);
         void carregarDeArquivo(std::string nomeArquivo);
