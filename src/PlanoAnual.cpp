@@ -15,8 +15,6 @@ bool PlanoAnual::aplicarRestricaoAcesso(int horaAcesso) {
  if(horaAcesso < 0 || horaAcesso > 23) {
   throw AcademiaException("Hora invalida!");
  }
- 
-  std::cout << "Plano Anual. Acesso liberado!";
   return true;
 }
 

@@ -250,8 +250,14 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
           break;
         }
       }
+      std::string statusStr;
+      switch (c->getMatricula().getStatus())
+      {
+        case StatusMatricula::ATIVA:        statusStr = "ATIVA";        break;
+        case StatusMatricula::INADIMPLENTE: statusStr = "INADIMPLENTE"; break;
+        case StatusMatricula::TRANCADA:     statusStr = "TRANCADA";     break;
+      }
 
-      //salvar arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";"
       arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";" 
               << c->getNome() << ";" << c->getCpf() << ";" << c->getEmail() << ";" 
               << planoId << ";" << treinoId << ";" << instrutorCpf << "\n";
@@ -328,7 +334,7 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
     }
     else if (tipo == "CLIENTE")
     {
-      std::string matStr, dataInicio, nome, cpf, email, planoId, treinoId, instrutorCpf;
+      std::string matStr, dataInicio, nome, cpf, email, planoId, treinoId, instrutorCpf, statusStr;
       std::getline(ss, matStr, ';');
       std::getline(ss, dataInicio, ';');
       std::getline(ss, nome, ';');
@@ -336,7 +342,12 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       std::getline(ss, email, ';');
       std::getline(ss, planoId, ';');
       std::getline(ss, treinoId, ';');
-      std::getline(ss, instrutorCpf);
+      std::getline(ss, instrutorCpf, ';');
+      std::getline(ss, statusStr);
+
+      StatusMatricula status = StatusMatricula::ATIVA;
+      if (statusStr == "INADIMPLENTE") status = StatusMatricula::INADIMPLENTE;
+      else if (statusStr == "TRANCADA") status = StatusMatricula::TRANCADA;
 
       Plano *planoCatalogo = buscarPlano(planoId);
       Plano *p = planoCatalogo ? planoCatalogo->clone() : nullptr;
@@ -345,7 +356,7 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
 
       Cliente *novoCliente = new Cliente(nome, cpf, email, p, dataInicio);
 
-      novoCliente->restaurarMatricula(std::stoi(matStr), dataInicio);
+      novoCliente->restaurarMatricula(std::stoi(matStr), dataInicio, status);
 
       if (t)
         novoCliente->associarTreino(t);

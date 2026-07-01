@@ -1,4 +1,4 @@
-#include "../include/Interface.hpp"
+#include "Interface.hpp"
 #include <iostream>
 #include <limits>
 using std::cin;
@@ -55,17 +55,25 @@ void interfaceCliente(Cliente& cliente)
                 break;
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
+                if (cliente.getTreinoDesignado() == nullptr){
+                    throw AcademiaException("Voce ainda nao possui um treino designado.");
+                }
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                 cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
                 cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
-                cout << "=========================" << endl; 
+                cout << "=========================" << endl;
+                break;
             case 5:
             {
+                if (cliente.getTreinoDesignado() == nullptr) {       // <- ADICIONAR: mesma proteção aqui
+                    throw AcademiaException("Voce precisa ter um treino designado antes de inicia-lo.");
+                }
                 cout << "Digite o horário de acesso (0-23): ";
                 int horaAcesso;
                 cin >> horaAcesso;
                 if(cliente.getPlanoAtual()->aplicarRestricaoAcesso(horaAcesso))
                 {
+                    cout << cliente.getPlanoAtual()->getTipoPlano() << ". Acesso liberado!" << endl;
                     cout << "====== Iniciando Treino ======" << endl;
                     cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                     cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
@@ -78,7 +86,7 @@ void interfaceCliente(Cliente& cliente)
                 cout << "Retornando ao menu principal..." << endl;
                 break;
             default:
-                throw AcademiaException("Opção Inválida");
+                throw AcademiaException("Opção Invalida");
         }
     }
     while (opcao != 0); 
@@ -273,7 +281,14 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     }
 
                     Cliente* c = new Cliente(nome, cpf, email, plano, "01/01/2026");
-                    gerenciador.cadastrarCliente(c);
+                    try {
+                        gerenciador.cadastrarCliente(c);
+                    } catch (...){
+                        delete c;
+                        throw;
+                    }
+                    
+          
 
                     cout << "Cliente cadastrado!" << endl;
                     cout << "=========================" << endl;
@@ -341,6 +356,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
                                     cin >> cpfNovo;
+                                    bool cpfEmUso = true;
+                                    try { gerenciador.consultarCliente(cpfNovo); }
+                                    catch (const AcademiaException&) { cpfEmUso = false; }
+
+                                    if (cpfEmUso) {
+                                        throw AcademiaException("Erro: Ja existe um cliente cadastrado com este CPF.");
+                                    }
                                     cliente->setCPF(cpfNovo);  
                                     break;
                                 }
@@ -452,7 +474,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 {
                     int escolha;
                     cout << "====== Painel de Remocao (Cliente) ======" << endl;
-                    cout << "Digite o cpf do aluno que deseja remover: ";
+                    cout << "Digite o CPF do aluno que deseja remover: ";
                     cin >> cpf;
                     Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
@@ -495,8 +517,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     }
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
-                    gerenciador.cadastrarInstrutor(i); 
-
+                    try {
+                        gerenciador.cadastrarInstrutor(i);
+                    } catch (...){
+                        delete i;
+                        throw;
+                    }
+                    
                     cout << "Instrutor cadastrado!" << endl;
                     cout << "=========================" << endl;
                     break;
@@ -509,7 +536,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref inválido");
+                        throw AcademiaException("Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref); 
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -526,7 +553,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref inválido");
+                        throw AcademiaException("Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -572,6 +599,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
                                     cin >> cpfNovo;
+                                    bool cpfEmUso = true;
+                                    try { gerenciador.consultarInstrutorPorCpf(cpfNovo); }
+                                    catch (const AcademiaException&) { cpfEmUso = false; }
+
+                                    if (cpfEmUso) {
+                                        throw AcademiaException("Erro: Ja existe um instrutor cadastrado com este CPF.");
+                                    }
                                     instrutor->setCPF(cpfNovo);  
                                     break;
                                 }
@@ -620,6 +654,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Remocao (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja remover: ";
                     cin >> cref;
+                    if (cref.empty())
+                    {
+                        throw AcademiaException("Cref invalido");
+                    }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
                     cout << "CPF: " << instrutor->getCpf() << endl;
