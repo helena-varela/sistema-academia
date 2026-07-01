@@ -50,6 +50,7 @@ void interfaceCliente(Cliente& cliente)
                 cout << "====== Seu Treino Atual ======" << endl;
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                 cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
+                cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
                 cout << "=========================" << endl; 
             case 5:
             {
