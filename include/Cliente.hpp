@@ -37,6 +37,8 @@ class Cliente : public Pessoa
 
         Treino* getTreinoDesignado() const;
 
+        Matricula getMatricula() const;
+
         int getCodigoMatricula() const;
 
         bool ValidarEntrada() const override;

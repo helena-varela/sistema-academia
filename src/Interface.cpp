@@ -21,9 +21,14 @@ void interfaceCliente(Cliente& cliente)
         cout << "2. Visualizar Matricula" << endl;
         cout << "3. Visualizar Plano Atual" << endl;
         cout << "4. Visualizar Treino" << endl;
+        cout << "5. Iniciar Treino" << endl;
         cout << "0. Retornar" << endl;
 
         cin >> opcao;
+        if (opcao < 0 || opcao > 5)
+        {
+            throw AcademiaException("Opcao invalida!");
+        }
 
         switch (opcao)
         {
@@ -50,14 +55,25 @@ void interfaceCliente(Cliente& cliente)
                 break;
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
-                if (cliente.getTreinoDesignado() != nullptr) {
+                cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
+                cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
+                cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
+                cout << "=========================" << endl; 
+            case 5:
+            {
+                cout << "Digite o horário de acesso (0-23): ";
+                int horaAcesso;
+                cin >> horaAcesso;
+                if(cliente.getPlanoAtual()->aplicarRestricaoAcesso(horaAcesso))
+                {
+                    cout << "====== Iniciando Treino ======" << endl;
                     cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                     cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
-                } else {
-                    cout << "Treino: Voce ainda nao possui um treino designado por um instrutor." << endl;
+                    cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
+                    cout << "=========================" << endl;
                 }
-                cout << "=========================" << endl;
                 break;
+            }
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;
@@ -86,6 +102,10 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
     cout << "0. Retornar" << endl;
 
     cin >> opcao;
+    if (opcao < 0 || opcao > 4)
+    {
+        throw AcademiaException("Opcao invalida!");
+    }
 
         switch (opcao)
         {
@@ -223,6 +243,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
     cout << "0. Retornar" << endl;
 
     cin >> opcao;
+    if (opcao < 0 || opcao > 8)
+    {
+        throw AcademiaException("Opcao invalida!");
+    }
 
     switch (opcao)
         {
@@ -288,8 +312,12 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     else if (escolha == 1)
                     {
                         int choice;
-                        cout << "Qual informação deseja atualizar? (1.nome, 2.cpf, 3.email, 4.plano)" << endl;
+                        cout << "Qual informação deseja atualizar? (1.nome, 2.cpf, 3.email, 4.plano, 5.Estado da Matricula)" << endl;
                         cin >> choice;
+                        if (choice < 1 || choice > 5)
+                        {
+                            throw AcademiaException("Opcao invalida!");
+                        }
                         switch(choice)
                         {
                             case 1:
@@ -337,7 +365,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     cout << "Digite o novo tipo de Plano (Mensal/Anual):";
                                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                                     getline(cin, planoNovoTipo);
-                                    if (planoNovoTipo.empty())
+                                    if (planoNovoTipo.empty() || (planoNovoTipo != "Mensal" && planoNovoTipo != "Anual"))
                                     {
                                         throw AcademiaException("Tipo de Plano inválido");
                                     }
@@ -374,9 +402,46 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                         }
                                         cliente->setPlano(planoNovo);  
                                     }
-
+                                    break;
                                 }
-                                break;
+                                case 5:
+                                {
+                                    cout << "Status atual da matricula: " << endl;
+                                    auto status = cliente->getMatricula().getStatus();
+                                    switch (status)
+                                    {
+                                        case StatusMatricula::ATIVA:
+                                            cout << "ATIVA" << endl;
+                                            break;
+                                        case StatusMatricula::INADIMPLENTE:
+                                            cout << "INADIMPLENTE" << endl;
+                                            break;
+                                        case StatusMatricula::TRANCADA:
+                                            cout << "TRANCADA" << endl;
+                                            break;
+                                    }
+                                    cout << "Digite o novo estado da matricula (1. ATIVA, 2. INADIMPLENTE, 3. TRANCADA): ";
+                                    int novoEstado;
+                                    cin >> novoEstado;
+                                    if (novoEstado < 1 || novoEstado > 3)
+                                    {
+                                        throw AcademiaException("Opcao invalida!");
+                                    }
+                                    StatusMatricula novoStatus;
+                                    switch (novoEstado)
+                                    {
+                                        case 1:
+                                            cliente->getMatricula().alterarEstado(StatusMatricula::ATIVA);
+                                            break;
+                                        case 2:
+                                            cliente->getMatricula().alterarEstado(StatusMatricula::INADIMPLENTE);
+                                            break;
+                                        case 3:
+                                            cliente->getMatricula().alterarEstado(StatusMatricula::TRANCADA);
+                                            break;
+                                    }
+                                }
+                                
                         }
                     }
                     cout << "=========================" << endl; 
@@ -423,6 +488,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     getline(cin, cref);
                     cout << "Digite a especialidade: ";
                     getline(cin, especialidade);
+                    if (nome.empty() || cpf.empty() || email.empty() || cref.empty() || especialidade.empty())
+                    {
+                        throw AcademiaException("Todos os campos devem ser preenchidos!");
+                    }
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
                     gerenciador.cadastrarInstrutor(i); 
@@ -438,6 +507,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Consulta (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja consultar: ";
                     cin >> cref;
+                    if (cref.empty())
+                    {
+                        throw AcademiaException("Cref inválido");
+                    }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref); 
                     cout << "Nome: " << instrutor->getNome() << endl;
                     cout << "E-mail: " << instrutor->getEmail() << endl;
@@ -451,6 +524,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Atualizacao (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja atualizar: ";
                     cin >> cref;
+                    if (cref.empty())
+                    {
+                        throw AcademiaException("Cref inválido");
+                    }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
                     cout << "CPF: " << instrutor->getCpf() << endl;
@@ -468,6 +545,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                         int choice;
                         cout << "Qual informação deseja atualizar? (1.nome, 2.cpf, 3.email, 4.especialidade)" << endl;
                         cin >> choice;
+                        if (choice < 1 || choice > 4)
+                        {
+                            throw AcademiaException("Opcao invalida!");
+                        }
                         switch(choice)
                         {
                             case 1:
