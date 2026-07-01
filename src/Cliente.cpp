@@ -11,14 +11,13 @@ Cliente::Cliente(const std::string& nome,
       matricula(dataInicio)
 {
     if(plano == nullptr) {
-        throw AcademiaException("Cliente nao pode ser cadatrado sem um plano valido.");
+        throw AcademiaException("Cliente nao pode ser cadastrado sem um plano valido.");
     }
 }
 
 Cliente::~Cliente()
 {
     delete planoAtual;
-    delete treinoDesignado;
 }
 
 void Cliente::associarTreino(Treino* treino)
@@ -27,7 +26,6 @@ void Cliente::associarTreino(Treino* treino)
     {
         throw AcademiaException("Treino invalido.");
     }
-    delete treinoDesignado;
     treinoDesignado = treino;
 }
 

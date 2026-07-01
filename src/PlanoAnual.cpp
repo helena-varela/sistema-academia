@@ -24,3 +24,7 @@ std::string PlanoAnual::getTipoPlano() const
 {
   return "Plano Anual";
 }
+
+Plano* PlanoAnual::clone() const {
+  return new PlanoAnual(precoBase, mesesFidelidade, descontoFidelidade);
+}

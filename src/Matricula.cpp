@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/Matricula.hpp"
+#include "Matricula.hpp"
 
 int Matricula::ultimoCodigo = 0; //Códido ID base
 
@@ -24,7 +24,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
 {
     if (atual == novoEstado) //Não é permitido o mesmo estado
     {
-        throw AcademiaException("Esse ja e o estado atual da Matrícula");
+        throw AcademiaException("Esse ja e o estado atual da matricula");
     }
     switch (atual)
     {
@@ -47,7 +47,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
             } 
             break;
     }
-    throw AcademiaException("Transição de estado invalida.");
+    throw AcademiaException("Transicao de estado invalida.");
 }
 
 StatusMatricula Matricula::getStatus() const //getter de status

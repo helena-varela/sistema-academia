@@ -1,7 +1,7 @@
 #include <iostream>
-#include "../include/AcademiaException.hpp"
-#include "../include/GerenciadorAcademia.hpp"
-#include "../include/Interface.hpp"
+#include "AcademiaException.hpp"
+#include "GerenciadorAcademia.hpp"
+#include "Interface.hpp"
 using namespace std;
 
 int main()
@@ -70,7 +70,7 @@ int main()
                     break;
 
                 default:
-                    throw AcademiaException("Opção Inválida");
+                    throw AcademiaException("Opção Invalida");
             }
         }
         catch(const AcademiaException& e){

@@ -258,7 +258,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 2:
                 {
                     cout << "====== Painel de Consulta (Cliente) ======" << endl;
-                    cout << "Digite o cpf do aluno que deseja consultar: ";
+                    cout << "Digite o CPF do aluno que deseja consultar: ";
                     cin >> cpf;
                     Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
@@ -271,7 +271,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 {
                     int escolha;
                     cout << "====== Painel de Atualizacao (Cliente) ======" << endl;
-                    cout << "Digite o cpf do aluno que deseja atualizar: ";
+                    cout << "Digite o CPF do aluno que deseja atualizar: ";
                     cin >> cpf;
                     Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;

@@ -13,6 +13,7 @@ class PlanoMensal : public Plano
         double calcularMensalidade() override;
         bool aplicarRestricaoAcesso(int horaAcesso) override;
         std::string getTipoPlano() const override;
+        Plano* clone() const override;
 };
 
 #endif

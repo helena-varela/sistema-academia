@@ -15,7 +15,7 @@ double PlanoMensal::calcularMensalidade() {
 bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
   if(horaAcesso >= 18 && horaAcesso <= 20) 
   {
-    throw AcademiaException("Horário de pico. Acesso bloqueado!");
+    throw AcademiaException("Horario de pico. Acesso bloqueado!");
   }
   return true;
 }
@@ -23,4 +23,8 @@ bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
 std::string PlanoMensal::getTipoPlano() const
 {
   return "Plano Mensal";
+}
+
+Plano* PlanoMensal::clone() const {
+  return new PlanoMensal(precoBase, taxaInscricaoAvulsa);
 }
