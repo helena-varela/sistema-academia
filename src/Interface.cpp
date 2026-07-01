@@ -38,14 +38,21 @@ void interfaceCliente(Cliente& cliente)
                 cout << "CPF: " << cliente.getCpf() << endl;
                 cout << "E-mail: " << cliente.getEmail() << endl;
                 cout << "=========================" << endl;
+                break;
             case 2:
                 cout << "====== Seu ID ======" << endl;
                 cout << "Matrícula: " << cliente.getCodigoMatricula() << endl;
-                cout << "=========================" << endl; 
+                cout << "=========================" << endl;
+                break;
             case 3:
                 cout << "====== Seu Plano Atual ======" << endl;
-                cout << "Plano: " << cliente.getPlanoAtual()->getTipoPlano() << endl;
+                if (cliente.getPlanoAtual() != nullptr) {
+                    cout << "Plano: " << cliente.getPlanoAtual()->getTipoPlano() << endl;
+                } else {
+                    cout << "Plano: Nenhum plano ativo ou cadastrado no sistema." << endl;
+                }
                 cout << "=========================" << endl; 
+                break;
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
@@ -77,7 +84,7 @@ void interfaceCliente(Cliente& cliente)
     while (opcao != 0); 
 }
 
-void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
+void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
 {
     int opcao;
     int id;
@@ -120,7 +127,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 }
                 else if (escolha == 1)
                 {
-                    instrutor.adicionarAlunoSupervisionado(cliente);
+                    instrutor->adicionarAlunoSupervisionado(cliente);
                     cout << "Cliente Adicionado com Sucesso" << endl;
                 }
                 cout << "=========================" << endl;
@@ -131,7 +138,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 int codigo;
                 cout << "Informe o codigo da matricula: ";
                 cin >> codigo;
-                Cliente* cliente = instrutor.consultarAlunoSupervisionado(codigo); 
+                Cliente* cliente = instrutor->consultarAlunoSupervisionado(codigo); 
                 cin.ignore();
                 string foco;
                 cout << "Qual o foco do treino: ";
@@ -153,7 +160,10 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                     exercicios.push_back(exercicio);
                 }
                 Treino* treino = new Treino(foco, exercicios, duracao);
-                instrutor.prescreverTreino(cliente, treino);
+                instrutor->prescreverTreino(cliente, treino);
+            
+                gerenciador.cadastrarTreino(treino);
+
                 cout << "Treino prescrito com sucesso!" << endl;
                 cout << "=========================" << endl; 
                 break;
@@ -162,7 +172,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 cout << "====== Painel de Remocao ======" << endl;
                 cout << "Digite o id do aluno que deseja remover da supervisao: ";
                 cin >> id;
-                cliente = instrutor.consultarAlunoSupervisionado(id); 
+                cliente = instrutor->consultarAlunoSupervisionado(id); 
                 cout << "Nome: " << cliente->getNome() << endl;
                 cout << "E-mail: " << cliente->getEmail() << endl;
                 cout << "Esse e o cliente que deseja remover?" << endl;
@@ -175,7 +185,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
                 }
                 else if (escolha == 1)
                 {
-                    instrutor.removerAlunoSupervisionado(cliente);
+                    instrutor->removerAlunoSupervisionado(cliente);
                     cout << "Cliente Removido com Sucesso" << endl;
                 }
                 cout << "=========================" << endl; 
@@ -183,7 +193,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor& instrutor)
             case 4:
                 {
                     cout << "====== Lista de Alunos Supervisionados ======" << endl;
-                    std::list<Cliente*> alunos = instrutor.getAlunosSobSupervisao();
+                    std::list<Cliente*> alunos = instrutor->getAlunosSobSupervisao();
 
                     if (alunos.empty())
                     {
