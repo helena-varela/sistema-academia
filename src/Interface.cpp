@@ -58,9 +58,13 @@ void interfaceCliente(Cliente& cliente)
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                 cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
                 cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
-                cout << "=========================" << endl; 
+                cout << "=========================" << endl;
+                break;
             case 5:
             {
+                if (cliente.getTreinoDesignado() == nullptr) {       // <- ADICIONAR: mesma proteção aqui
+                    throw AcademiaException("Voce precisa ter um treino designado antes de inicia-lo.");
+                }
                 cout << "Digite o horário de acesso (0-23): ";
                 int horaAcesso;
                 cin >> horaAcesso;
@@ -78,7 +82,7 @@ void interfaceCliente(Cliente& cliente)
                 cout << "Retornando ao menu principal..." << endl;
                 break;
             default:
-                throw AcademiaException("Opção Inválida");
+                throw AcademiaException("Opção Invalida");
         }
     }
     while (opcao != 0); 
@@ -452,7 +456,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 {
                     int escolha;
                     cout << "====== Painel de Remocao (Cliente) ======" << endl;
-                    cout << "Digite o cpf do aluno que deseja remover: ";
+                    cout << "Digite o CPF do aluno que deseja remover: ";
                     cin >> cpf;
                     Cliente* cliente = gerenciador.consultarCliente(cpf);
                     cout << "Nome: " << cliente->getNome() << endl;
@@ -509,7 +513,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref inválido");
+                        throw AcademiaException("Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref); 
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -526,7 +530,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref inválido");
+                        throw AcademiaException("Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -620,6 +624,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "====== Painel de Remocao (Instrutor) ======" << endl;
                     cout << "Digite o cref do instrutor que deseja remover: ";
                     cin >> cref;
+                    if (cref.empty())
+                    {
+                        throw AcademiaException("Cref invalido");
+                    }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
                     cout << "CPF: " << instrutor->getCpf() << endl;
