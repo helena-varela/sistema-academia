@@ -124,8 +124,8 @@ std::istream& operator>>(std::istream& is, Cliente& cliente)
     return is;
 }
 
-void Cliente::restaurarMatricula(int codigo, const std::string& data){
-    matricula.setCodigoEData(codigo, data);
+void Cliente::restaurarMatricula(int codigo, const std::string& data, StatusMatricula status){
+    matricula.setCodigoEData(codigo, data, status);
 }
 
 std::string Cliente::getDataInicio() const {

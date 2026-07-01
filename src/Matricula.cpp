@@ -60,9 +60,10 @@ int Matricula::getCodigoMatricula() const //getter do código ID
     return codigoMatricula;
 }
 
-void Matricula::setCodigoEData(int codigo, const std::string& data){
+void Matricula::setCodigoEData(int codigo, const std::string& data, StatusMatricula status){
     codigoMatricula = codigo;
     dataInicio = data;
+    statusAtual = status;
     if(codigo > ultimoCodigo){
         ultimoCodigo = codigo;
     }

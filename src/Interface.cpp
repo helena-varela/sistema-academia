@@ -1,4 +1,4 @@
-#include "../include/Interface.hpp"
+#include "Interface.hpp"
 #include <iostream>
 #include <limits>
 using std::cin;
@@ -55,6 +55,9 @@ void interfaceCliente(Cliente& cliente)
                 break;
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
+                if (cliente.getTreinoDesignado() == nullptr){
+                    throw AcademiaException("Voce ainda nao possui um treino designado.");
+                }
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                 cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
                 cout << "Duração estimada: " << cliente.getTreinoDesignado()->getDuracao() << " minutos" << endl;
@@ -70,6 +73,7 @@ void interfaceCliente(Cliente& cliente)
                 cin >> horaAcesso;
                 if(cliente.getPlanoAtual()->aplicarRestricaoAcesso(horaAcesso))
                 {
+                    cout << cliente.getPlanoAtual()->getTipoPlano() << ". Acesso liberado!" << endl;
                     cout << "====== Iniciando Treino ======" << endl;
                     cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                     cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
@@ -277,7 +281,14 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     }
 
                     Cliente* c = new Cliente(nome, cpf, email, plano, "01/01/2026");
-                    gerenciador.cadastrarCliente(c);
+                    try {
+                        gerenciador.cadastrarCliente(c);
+                    } catch (...){
+                        delete c;
+                        throw;
+                    }
+                    
+          
 
                     cout << "Cliente cadastrado!" << endl;
                     cout << "=========================" << endl;
@@ -345,6 +356,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
                                     cin >> cpfNovo;
+                                    bool cpfEmUso = true;
+                                    try { gerenciador.consultarCliente(cpfNovo); }
+                                    catch (const AcademiaException&) { cpfEmUso = false; }
+
+                                    if (cpfEmUso) {
+                                        throw AcademiaException("Erro: Ja existe um cliente cadastrado com este CPF.");
+                                    }
                                     cliente->setCPF(cpfNovo);  
                                     break;
                                 }
@@ -499,8 +517,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     }
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
-                    gerenciador.cadastrarInstrutor(i); 
-
+                    try {
+                        gerenciador.cadastrarInstrutor(i);
+                    } catch (...){
+                        delete i;
+                        throw;
+                    }
+                    
                     cout << "Instrutor cadastrado!" << endl;
                     cout << "=========================" << endl;
                     break;
@@ -576,6 +599,13 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     string cpfNovo;
                                     cout << "Digite o novo CPF:";
                                     cin >> cpfNovo;
+                                    bool cpfEmUso = true;
+                                    try { gerenciador.consultarInstrutorPorCpf(cpfNovo); }
+                                    catch (const AcademiaException&) { cpfEmUso = false; }
+
+                                    if (cpfEmUso) {
+                                        throw AcademiaException("Erro: Ja existe um instrutor cadastrado com este CPF.");
+                                    }
                                     instrutor->setCPF(cpfNovo);  
                                     break;
                                 }

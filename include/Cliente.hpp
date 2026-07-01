@@ -42,7 +42,7 @@ class Cliente : public Pessoa
 
         bool ValidarEntrada() const override;
 
-        void restaurarMatricula(int codigo, const std::string& data);
+        void restaurarMatricula(int codigo, const std::string& data, StatusMatricula status);
         std::string getDataInicio() const;
 
         // void consultarCliente(std::string cpf);
