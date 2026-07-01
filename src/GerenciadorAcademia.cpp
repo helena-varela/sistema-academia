@@ -14,15 +14,22 @@ GerenciadorAcademia::GerenciadorAcademia()
 
 GerenciadorAcademia::~GerenciadorAcademia()
 {
-  for(Cliente* c : clientes){
+  for(auto c : clientes){
     delete c;
   }
-
-  for(Instrutor* i : instrutores){
+  for(auto i : instrutores){
     delete i;
+  }
+  for(auto plano : planosCadastrados){
+    delete plano;
+  }
+  for(auto treino : treinosCadastrados){
+    delete treino;
   }
   clientes.clear();
   instrutores.clear();
+  planosCadastrados.clear();
+  treinosCadastrados.clear();
 }
 
 // CRUD cliente
@@ -32,7 +39,7 @@ void GerenciadorAcademia::cadastrarCliente(Cliente *c)
   {
     if (c->getCpf() == clienteAtual->getCpf())
     {
-      throw AcademiaException("Erro: Cliente com este CPF já cadastrado.");
+      throw AcademiaException("Erro: Cliente com este CPF ja cadastrado.");
     }
   }
   clientes.push_back(c);
@@ -49,7 +56,7 @@ Cliente *GerenciadorAcademia::consultarCliente(const std::string &cpf)
       return clienteAtual;
     }
   }
-  throw AcademiaException("Erro: Cliente não cadastrado!");
+  throw AcademiaException("Erro: Cliente nao cadastrado!");
 }
 
 Cliente* GerenciadorAcademia::consultarClienteBase(int codigoMatricula)
@@ -61,41 +68,52 @@ Cliente* GerenciadorAcademia::consultarClienteBase(int codigoMatricula)
       return clienteAtual;
     }
   }
-  throw AcademiaException("Erro: Cliente não cadastrado!");
+  throw AcademiaException("Erro: Cliente nao cadastrado!");
 }
 
 void GerenciadorAcademia::atualizarCliente(const std::string &cpf, Cliente *novoC)
 {
-  for(Cliente*& clienteAtual : clientes) {
-    if(clienteAtual->getCpf() == cpf) {
-      delete clienteAtual;
-      clienteAtual = novoC;
+  for(size_t i = 0; i < clientes.size(); i++) {
+    if(clientes[i]->getCpf() == cpf) {
+      Cliente* clienteAntigo = clientes[i];
+      for (Instrutor* instrutor : instrutores) {
+        if (instrutor->supervisionaAluno(clienteAntigo)) {
+          instrutor->removerAlunoSupervisionado(clienteAntigo);
+          instrutor->adicionarAlunoSupervisionado(novoC);
+        }
+      }
+      delete clienteAntigo;
+      clientes[i] = novoC;
       std::cout << "Cliente atualizado com sucesso!" << std::endl;
       return;
     }
   }
-  throw AcademiaException("Erro: Cliente não cadastrado!");
+  throw AcademiaException("Erro: Cliente nao cadastrado!");
 }
 
 void GerenciadorAcademia::removerCliente(const std::string &cpf)
 {
-  for (size_t i = 0; i < clientes.size(); i++)
-  {
-    if (clientes[i]->getCpf() == cpf)
-    {
+  for (size_t i = 0; i < clientes.size(); i++){
+    if (clientes[i]->getCpf() == cpf){
+      Cliente* clienteARemover = clientes[i];
+      for (Instrutor* instrutor : instrutores) {
+        if (instrutor->supervisionaAluno(clienteARemover)) {
+          instrutor->removerAlunoSupervisionado(clienteARemover);
+        }
+      }
       delete clientes[i];
       clientes.erase(clientes.begin() + i);
       std::cout << "Cliente removido com sucesso!" << std::endl;
       return;
     }
   }
-  throw AcademiaException("Erro: Cliente não existe na base de dados!");
+  throw AcademiaException("Erro: Cliente nao existe na base de dados!");
 }
 
 // métodos de busca
 Plano *GerenciadorAcademia::buscarPlano(const std::string &id)
 {
-  for (auto *plano : planosCadastrados)
+  for (auto plano : planosCadastrados)
   {
     if (plano->getTipoPlano() == id)
       return plano;
@@ -105,7 +123,7 @@ Plano *GerenciadorAcademia::buscarPlano(const std::string &id)
 
 Treino *GerenciadorAcademia::buscarTreino(const std::string &id)
 {
-  for (auto *treino : treinosCadastrados)
+  for (auto treino : treinosCadastrados)
   {
     if (treino->getFoco() == id)
       return treino;
@@ -115,7 +133,7 @@ Treino *GerenciadorAcademia::buscarTreino(const std::string &id)
 
 Instrutor *GerenciadorAcademia::buscarInstrutor(const std::string &cpf)
 {
-  for (auto *instrutor : instrutores)
+  for (auto instrutor : instrutores)
   {
     if (instrutor->getCpf() == cpf)
       return instrutor;
@@ -128,7 +146,7 @@ void GerenciadorAcademia::cadastrarInstrutor(Instrutor* i)
 {
   for(Instrutor* instrutorAtual : instrutores){
     if(i->getCpf() == instrutorAtual->getCpf()) {
-      throw AcademiaException("Erro: Instrutor com este CPF já cadastrado.");
+      throw AcademiaException("Erro: Instrutor com este CPF ja cadastrado.");
     }
   } 
   instrutores.push_back(i);
@@ -146,7 +164,14 @@ void GerenciadorAcademia::removerInstrutor(const std::string& cpf)
       return;
     }
   }
-  throw AcademiaException("Erro: Instrutor não existe na base de dados!");
+  throw AcademiaException("Erro: Instrutor nao existe na base de dados!");
+}
+
+Instrutor* GerenciadorAcademia::consultarInstrutorPorCpf(const std::string& cpf) {
+  for (auto instrutor : instrutores) {
+    if (instrutor->getCpf() == cpf) return instrutor;
+  }
+  throw AcademiaException("Erro: Instrutor nao cadastrado!");
 }
 
 void GerenciadorAcademia::cadastrarTreino(Treino* t)
@@ -163,7 +188,7 @@ Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
       return instrutorAtual;
     }
   }
-  throw AcademiaException("Erro: Instrutor não cadastrado!");
+  throw AcademiaException("Erro: Instrutor nao cadastrado!");
 }
 
 // parte de arquivos
@@ -226,8 +251,10 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
         }
       }
 
-      arquivo << "CLIENTE;1;" << c->getNome() << ";" << c->getCpf() << ";"
-              << c->getEmail() << ";" << planoId << ";" << treinoId << ";" << instrutorCpf << "\n";
+      //salvar arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";"
+      arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";" 
+              << c->getNome() << ";" << c->getCpf() << ";" << c->getEmail() << ";" 
+              << planoId << ";" << treinoId << ";" << instrutorCpf << "\n";
     }
   }
 
@@ -241,7 +268,7 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
 
   if (!arquivo.is_open())
   {
-    throw AcademiaException("Erro: Não foi possivel abrir o arquivo para leitura.");
+    throw AcademiaException("Erro: Nao foi possivel abrir o arquivo para leitura.");
   }
 
   // limpa a memoria
@@ -301,8 +328,9 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
     }
     else if (tipo == "CLIENTE")
     {
-      std::string matStr, nome, cpf, email, planoId, treinoId, instrutorCpf;
+      std::string matStr, dataInicio, nome, cpf, email, planoId, treinoId, instrutorCpf;
       std::getline(ss, matStr, ';');
+      std::getline(ss, dataInicio, ';');
       std::getline(ss, nome, ';');
       std::getline(ss, cpf, ';');
       std::getline(ss, email, ';');
@@ -310,11 +338,14 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       std::getline(ss, treinoId, ';');
       std::getline(ss, instrutorCpf);
 
-      Plano *p = buscarPlano(planoId);
+      Plano *planoCatalogo = buscarPlano(planoId);
+      Plano *p = planoCatalogo ? planoCatalogo->clone() : nullptr;
       Treino *t = buscarTreino(treinoId);
       Instrutor *inst = buscarInstrutor(instrutorCpf);
 
-      Cliente *novoCliente = new Cliente(nome, cpf, email, p, "01/01/2026");
+      Cliente *novoCliente = new Cliente(nome, cpf, email, p, dataInicio);
+
+      novoCliente->restaurarMatricula(std::stoi(matStr), dataInicio);
 
       if (t)
         novoCliente->associarTreino(t);

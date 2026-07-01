@@ -24,6 +24,8 @@ class Matricula
         bool validarTransicao(StatusMatricula statusAtual, StatusMatricula novoEstado);
         int getCodigoMatricula() const;
         StatusMatricula getStatus() const;
+        void setCodigoEData(int codigo, const std::string& data);
+        std::string getDataInicio() const;
 };
 
 #endif

@@ -13,7 +13,7 @@ class Treino
         std::list<std::string> exercicios;
         int duracaoEstimadaMin;
     public:
-        Treino(std::string focoMuscular, std::list<std::string> exercicios, int duracaoEstimadaMin);
+        Treino(std::string focoMuscular, const std::list<std::string>& exercicios, int duracaoEstimadaMin);
         std::string getFoco() const;
         std::list<std::string> getExercicios() const;
         int getDuracao() const;

@@ -11,6 +11,7 @@ class Plano
         virtual double calcularMensalidade() = 0;
         virtual bool aplicarRestricaoAcesso(int horaAcesso) = 0;
         virtual std::string getTipoPlano() const = 0;
+        virtual Plano* clone() const = 0;
         virtual ~Plano();
 };
 

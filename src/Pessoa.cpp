@@ -22,7 +22,7 @@ Pessoa::Pessoa(const std::string& nome,
 
     if (!validarCPF(cpf))
     {
-        throw AcademiaException("CPF inválido.");
+        throw AcademiaException("CPF invalido.");
     }
 }
 
@@ -52,7 +52,7 @@ bool Pessoa::ValidarEntrada() const
            validarCPF(cpf);
 }
 
-bool Pessoa::validarCPF(const std::string& cpf) const
+bool Pessoa::validarCPF(const std::string& cpf)
 {
     if (cpf.length() != 11)
         return false;

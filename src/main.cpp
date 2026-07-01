@@ -1,7 +1,7 @@
 #include <iostream>
-#include "../include/AcademiaException.hpp"
-#include "../include/GerenciadorAcademia.hpp"
-#include "../include/Interface.hpp"
+#include "AcademiaException.hpp"
+#include "GerenciadorAcademia.hpp"
+#include "Interface.hpp"
 using namespace std;
 
 int main()
@@ -11,12 +11,20 @@ int main()
     bool executando = true;
     int opcao;
     string cpf;
+    string cref;
 
     try
     {
         gerenciador.carregarDeArquivo("data/backup.txt");
+    }
+    catch (const AcademiaException& e)
+    {
+        cout << "Aviso: " << e.what() << " Iniciando banco de dados vazio.\n";
+    }
 
-        while (executando)
+    while (executando)
+    {
+        try
         {
             cout << "=====================================" << endl;
             cout << "        SISTEMA UPESTEEM" << endl;
@@ -44,9 +52,9 @@ int main()
                     {
                         cout << "[Interface do Instrutor]" << endl;
                         cout << "Digite seu CREF: " << endl;
-                        cin >> cpf;
+                        cin >> cref;
                         {
-                            Instrutor* instrutor = gerenciador.consultarInstrutor(cpf);
+                            Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                             interfaceInstrutor(gerenciador, instrutor);
                         }
                         break;
@@ -62,16 +70,24 @@ int main()
                     break;
 
                 default:
-                    throw AcademiaException("Opção Inválida");
+                    throw AcademiaException("Opção Invalida");
             }
         }
+        catch(const AcademiaException& e){
+            std::cout << "Erro: " << e.what() << '\n';
+        }
+        
+    }
 
-        gerenciador.salvarEmArquivo("data/backup.txt");
-    }
-    catch (const AcademiaException& e)
+    try 
     {
-        cout << "Erro: " << e.what() << endl;
+        gerenciador.salvarEmArquivo("data/backup.txt");
+    } 
+    catch (const AcademiaException& e) 
+    {
+        cout << "Erro ao salvar backup: " << e.what() << '\n';
     }
+
 
     return 0;
 }
