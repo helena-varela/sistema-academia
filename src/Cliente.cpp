@@ -79,7 +79,11 @@ Treino* Cliente::getTreinoDesignado() const
     return treinoDesignado;
 }
 
-Matricula Cliente::getMatricula() const {
+const Matricula& Cliente::getMatricula() const {
+    return matricula;
+}
+
+Matricula& Cliente::getMatricula() {
     return matricula;
 }
 

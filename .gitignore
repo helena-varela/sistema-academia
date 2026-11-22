@@ -33,3 +33,4 @@ $RECYCLE.BIN/
 
 # Ignora os arquivos de texto dentro de data, mas mantém a pasta
 data/*.txt
+data/*.tmp

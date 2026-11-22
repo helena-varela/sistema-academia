@@ -228,6 +228,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
             default:
                 throw AcademiaException("Opção Inválida");
         }
+        gerenciador.salvarEmArquivo(ARQUIVO_BACKUP); // salva apos cada operacao
     }
     while (opcao != 0); 
 }
@@ -235,7 +236,6 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
 void interfaceGerenciador(GerenciadorAcademia& gerenciador)
 {
     int opcao;
-    int id;
     string cpf;
 
     do{
@@ -450,7 +450,6 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     {
                                         throw AcademiaException("Opcao invalida!");
                                     }
-                                    StatusMatricula novoStatus;
                                     switch (novoEstado)
                                     {
                                         case 1:
@@ -633,7 +632,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, especialidadeNova);
                                     if (especialidadeNova.empty())
                                     {
-                                        throw AcademiaException("Tipo de Plano inválido");
+                                        throw AcademiaException("Especialidade inválida");
                                     }
                                     else
                                     {
@@ -684,7 +683,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             default:
                 throw AcademiaException("Opção Inválida");
         }
-
+        gerenciador.salvarEmArquivo(ARQUIVO_BACKUP); // salva apos cada operacao
     }
     while (opcao != 0);
 }

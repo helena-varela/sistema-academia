@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <filesystem>
 GerenciadorAcademia::GerenciadorAcademia()
 {
   planosCadastrados.push_back(new PlanoMensal(100.0, 15.0));
@@ -194,7 +195,18 @@ Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
 // parte de arquivos
 void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
 {
-  std::ofstream arquivo(nomeArquivo);
+  // garante que a pasta de destino (ex: data/) exista antes de abrir o arquivo
+  std::filesystem::path pasta = std::filesystem::path(nomeArquivo).parent_path();
+  if (!pasta.empty())
+  {
+    std::error_code erro;
+    std::filesystem::create_directories(pasta, erro);
+  }
+
+  // escreve primeiro em um arquivo temporario e so depois substitui o original,
+  // assim uma interrupcao no meio da escrita nao apaga o backup anterior
+  std::string arquivoTemporario = nomeArquivo + ".tmp";
+  std::ofstream arquivo(arquivoTemporario);
 
   if (!arquivo.is_open())
   {
@@ -260,11 +272,22 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
 
       arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";" 
               << c->getNome() << ";" << c->getCpf() << ";" << c->getEmail() << ";" 
-              << planoId << ";" << treinoId << ";" << instrutorCpf << "\n";
+              << planoId << ";" << treinoId << ";" << instrutorCpf << ";" << statusStr << "\n";
     }
   }
 
   arquivo.close();
+  if (arquivo.fail())
+  {
+    throw AcademiaException("Erro: Falha ao gravar o arquivo de backup.");
+  }
+
+  std::error_code erroRename;
+  std::filesystem::rename(arquivoTemporario, nomeArquivo, erroRename);
+  if (erroRename)
+  {
+    throw AcademiaException("Erro: Nao foi possivel substituir o arquivo de backup.");
+  }
 }
 
 

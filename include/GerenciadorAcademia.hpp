@@ -11,6 +11,8 @@
 #include "AcademiaException.hpp"
 #include "Treino.hpp"
 
+inline const std::string ARQUIVO_BACKUP = "data/backup.txt";
+
 class GerenciadorAcademia
 {
     private:

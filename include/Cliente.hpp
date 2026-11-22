@@ -36,7 +36,8 @@ class Cliente : public Pessoa
 
         Treino* getTreinoDesignado() const;
 
-        Matricula getMatricula() const;
+        const Matricula& getMatricula() const;
+        Matricula& getMatricula();
 
         int getCodigoMatricula() const;
 

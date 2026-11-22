@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include "AcademiaException.hpp"
 #include "GerenciadorAcademia.hpp"
 #include "Interface.hpp"
@@ -15,7 +16,7 @@ int main()
 
     try
     {
-        gerenciador.carregarDeArquivo("data/backup.txt");
+        gerenciador.carregarDeArquivo(ARQUIVO_BACKUP);
     }
     catch (const AcademiaException& e)
     {
@@ -35,7 +36,18 @@ int main()
             cout << "0 - Sair" << endl;
             cout << "=====================================" << endl;
             cout << "Escolha uma opcao: ";
-            cin >> opcao;
+            if (!(cin >> opcao))
+            {
+                if (cin.eof()) // entrada encerrada (Ctrl+D): sai do sistema salvando
+                {
+                    executando = false;
+                    continue;
+                }
+                // entrada nao numerica: limpa o estado do cin para evitar loop infinito
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                throw AcademiaException("Digite apenas o numero da opcao.");
+            }
 
             switch (opcao)
             {
@@ -76,12 +88,23 @@ int main()
         catch(const AcademiaException& e){
             std::cout << "Erro: " << e.what() << '\n';
         }
-        
+
+        // salva ao voltar ao menu principal (inclusive apos erros),
+        // para nao perder alteracoes se o programa for encerrado abruptamente
+        try
+        {
+            gerenciador.salvarEmArquivo(ARQUIVO_BACKUP);
+        }
+        catch (const AcademiaException& e)
+        {
+            cout << "Erro ao salvar backup: " << e.what() << '\n';
+        }
+
     }
 
     try 
     {
-        gerenciador.salvarEmArquivo("data/backup.txt");
+        gerenciador.salvarEmArquivo(ARQUIVO_BACKUP);
     } 
     catch (const AcademiaException& e) 
     {
