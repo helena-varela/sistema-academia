@@ -1,6 +1,6 @@
 #include <iostream>
 #include <limits>
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 #include "GerenciadorAcademia.hpp"
 #include "Interface.hpp"
 using namespace std;
@@ -18,7 +18,7 @@ int main()
     {
         gerenciador.carregarDeArquivo(ARQUIVO_BACKUP);
     }
-    catch (const AcademiaException& e)
+    catch (const PersistenciaException& e)
     {
         cout << "Aviso: " << e.what() << " Iniciando banco de dados vazio.\n";
     }
@@ -46,7 +46,7 @@ int main()
                 // entrada nao numerica: limpa o estado do cin para evitar loop infinito
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                throw AcademiaException("Digite apenas o numero da opcao.");
+                throw DadosInvalidosException("opcao", "Digite apenas o numero da opcao.");
             }
 
             switch (opcao)
@@ -94,11 +94,49 @@ int main()
                     break;
 
                 default:
-                    throw AcademiaException("Opção Invalida");
+                    throw DadosInvalidosException("opcao", "Opcao invalida!");
             }
         }
-        catch(const AcademiaException& e){
-            std::cout << "Erro: " << e.what() << '\n';
+        // tratamento especifico por tipo de excecao (da mais especifica para a mais geral)
+        catch (const AutenticacaoException& e)
+        {
+            cout << "Falha no login (" << e.getPerfil() << "): " << e.what() << '\n';
+        }
+        catch (const AcessoNegadoException& e)
+        {
+            cout << "Acesso negado [" << e.getRecurso() << "]: " << e.what() << '\n';
+        }
+        catch (const DadosInvalidosException& e)
+        {
+            cout << "Dado invalido [" << e.getCampo() << "]: " << e.what() << '\n';
+        }
+        catch (const RegistroNaoEncontradoException& e)
+        {
+            cout << "Nao encontrado: " << e.what() << '\n';
+        }
+        catch (const RegistroDuplicadoException& e)
+        {
+            cout << "Cadastro duplicado: " << e.what() << '\n';
+        }
+        catch (const TransicaoEstadoInvalidaException& e)
+        {
+            cout << "Operacao nao permitida: " << e.what() << '\n';
+        }
+        catch (const PagamentoRecusadoException& e)
+        {
+            cout << "Pagamento recusado (" << e.getFormaPagamento() << "): " << e.what() << '\n';
+        }
+        catch (const PersistenciaException& e)
+        {
+            cout << "Erro ao acessar os dados: " << e.what() << '\n';
+        }
+        catch (const AcademiaException& e) // qualquer outra excecao do sistema
+        {
+            cout << "Erro: " << e.what() << '\n';
+        }
+        catch (const std::exception& e) // erros inesperados da biblioteca padrao
+        {
+            cout << "Erro inesperado: " << e.what() << '\n';
         }
 
         // salva ao voltar ao menu principal (inclusive apos erros),
@@ -107,7 +145,7 @@ int main()
         {
             gerenciador.salvarEmArquivo(ARQUIVO_BACKUP);
         }
-        catch (const AcademiaException& e)
+        catch (const PersistenciaException& e)
         {
             cout << "Erro ao salvar backup: " << e.what() << '\n';
         }
@@ -118,7 +156,7 @@ int main()
     {
         gerenciador.salvarEmArquivo(ARQUIVO_BACKUP);
     } 
-    catch (const AcademiaException& e) 
+    catch (const PersistenciaException& e)
     {
         cout << "Erro ao salvar backup: " << e.what() << '\n';
     }

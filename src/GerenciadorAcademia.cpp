@@ -47,7 +47,7 @@ void GerenciadorAcademia::cadastrarCliente(Cliente *c)
   {
     if (c->getCpf() == clienteAtual->getCpf())
     {
-      throw AcademiaException("Erro: Cliente com este CPF ja cadastrado.");
+      throw RegistroDuplicadoException("cliente", "o CPF " + c->getCpf());
     }
   }
   clientes.push_back(c);
@@ -64,7 +64,7 @@ Cliente *GerenciadorAcademia::consultarCliente(const std::string &cpf)
       return clienteAtual;
     }
   }
-  throw AcademiaException("Erro: Cliente nao cadastrado!");
+  throw RegistroNaoEncontradoException("Cliente", "CPF " + cpf);
 }
 
 Cliente* GerenciadorAcademia::consultarClienteBase(int codigoMatricula)
@@ -76,7 +76,7 @@ Cliente* GerenciadorAcademia::consultarClienteBase(int codigoMatricula)
       return clienteAtual;
     }
   }
-  throw AcademiaException("Erro: Cliente nao cadastrado!");
+  throw RegistroNaoEncontradoException("Cliente", "matricula " + std::to_string(codigoMatricula));
 }
 
 void GerenciadorAcademia::atualizarCliente(const std::string &cpf, Cliente *novoC)
@@ -101,7 +101,7 @@ void GerenciadorAcademia::atualizarCliente(const std::string &cpf, Cliente *novo
       return;
     }
   }
-  throw AcademiaException("Erro: Cliente nao cadastrado!");
+  throw RegistroNaoEncontradoException("Cliente", "CPF " + cpf);
 }
 
 void GerenciadorAcademia::removerCliente(const std::string &cpf)
@@ -121,7 +121,7 @@ void GerenciadorAcademia::removerCliente(const std::string &cpf)
       return;
     }
   }
-  throw AcademiaException("Erro: Cliente nao existe na base de dados!");
+  throw RegistroNaoEncontradoException("Cliente", "CPF " + cpf);
 }
 
 // métodos de busca
@@ -140,7 +140,7 @@ Plano *GerenciadorAcademia::criarPlanoDoCatalogo(const std::string &tipo)
   Plano *modelo = buscarPlano("Plano " + tipo);
   if (modelo == nullptr)
   {
-    throw AcademiaException("Tipo de Plano invalido (use Mensal ou Anual).");
+    throw DadosInvalidosException("plano", "Tipo de Plano invalido (use Mensal ou Anual).");
   }
   return modelo->clone(); // cada cliente recebe sua propria copia
 }
@@ -170,7 +170,7 @@ void GerenciadorAcademia::cadastrarInstrutor(Instrutor* i)
 {
   for(Instrutor* instrutorAtual : instrutores){
     if(i->getCpf() == instrutorAtual->getCpf()) {
-      throw AcademiaException("Erro: Instrutor com este CPF ja cadastrado.");
+      throw RegistroDuplicadoException("instrutor", "o CPF " + i->getCpf());
     }
   } 
   instrutores.push_back(i);
@@ -188,14 +188,14 @@ void GerenciadorAcademia::removerInstrutor(const std::string& cpf)
       return;
     }
   }
-  throw AcademiaException("Erro: Instrutor nao existe na base de dados!");
+  throw RegistroNaoEncontradoException("Instrutor", "CPF " + cpf);
 }
 
 Instrutor* GerenciadorAcademia::consultarInstrutorPorCpf(const std::string& cpf) {
   for (auto instrutor : instrutores) {
     if (instrutor->getCpf() == cpf) return instrutor;
   }
-  throw AcademiaException("Erro: Instrutor nao cadastrado!");
+  throw RegistroNaoEncontradoException("Instrutor", "CPF " + cpf);
 }
 
 void GerenciadorAcademia::cadastrarTreino(Treino* t)
@@ -212,7 +212,7 @@ Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
       return instrutorAtual;
     }
   }
-  throw AcademiaException("Erro: Instrutor nao cadastrado!");
+  throw RegistroNaoEncontradoException("Instrutor", "CREF " + cref);
 }
 
 // autenticacao
@@ -227,7 +227,7 @@ Cliente* GerenciadorAcademia::autenticarCliente(const std::string& cpf, const st
       return c;
     }
   }
-  throw AcademiaException("CPF ou senha incorretos.");
+  throw AutenticacaoException("cliente", "CPF ou senha incorretos.");
 }
 
 Instrutor* GerenciadorAcademia::autenticarInstrutor(const std::string& cref, const std::string& senha)
@@ -239,14 +239,14 @@ Instrutor* GerenciadorAcademia::autenticarInstrutor(const std::string& cref, con
       return i;
     }
   }
-  throw AcademiaException("CREF ou senha incorretos.");
+  throw AutenticacaoException("instrutor", "CREF ou senha incorretos.");
 }
 
 void GerenciadorAcademia::autenticarGerente(const std::string& senha) const
 {
   if (Pessoa::gerarHash(senha) != senhaGerenteHash)
   {
-    throw AcademiaException("Senha do gerente incorreta.");
+    throw AutenticacaoException("gerente", "Senha do gerente incorreta.");
   }
 }
 
@@ -255,7 +255,7 @@ void GerenciadorAcademia::alterarSenhaGerente(const std::string& senhaAtual, con
   autenticarGerente(senhaAtual);
   if (novaSenha.size() < 4)
   {
-    throw AcademiaException("A senha deve ter pelo menos 4 caracteres.");
+    throw DadosInvalidosException("senha", "A senha deve ter pelo menos 4 caracteres.");
   }
   senhaGerenteHash = Pessoa::gerarHash(novaSenha);
 }
@@ -307,7 +307,7 @@ Pagamento* GerenciadorAcademia::registrarPagamento(Pagamento* p)
 {
   if (p == nullptr)
   {
-    throw AcademiaException("Pagamento invalido.");
+    throw DadosInvalidosException("pagamento", "Pagamento invalido.");
   }
 
   try
@@ -315,13 +315,13 @@ Pagamento* GerenciadorAcademia::registrarPagamento(Pagamento* p)
     // Regra: o cliente precisa estar cadastrado na academia
     if (std::find(clientes.begin(), clientes.end(), p->getCliente()) == clientes.end())
     {
-      throw AcademiaException("Cliente do pagamento nao esta cadastrado.");
+      throw RegistroNaoEncontradoException("Cliente", "CPF " + p->getCliente()->getCpf());
     }
 
     // Regra: nao pode haver dois pagamentos ativos para o mesmo mes
     if (existePagamentoAtivo(p->getCliente(), p->getMesReferencia()))
     {
-      throw AcademiaException("Ja existe um pagamento confirmado ou pendente para " +
+      throw PagamentoRecusadoException(p->getTipo(), "Ja existe um pagamento confirmado ou pendente para " +
                               p->getMesReferencia() + ".");
     }
 
@@ -353,7 +353,7 @@ Pagamento* GerenciadorAcademia::consultarPagamento(int codigo) const
       return p;
     }
   }
-  throw AcademiaException("Pagamento nao encontrado.");
+  throw RegistroNaoEncontradoException("Pagamento", "codigo " + std::to_string(codigo));
 }
 
 void GerenciadorAcademia::confirmarPagamento(int codigo)
@@ -467,7 +467,7 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
 
   if (!arquivo.is_open())
   {
-    throw AcademiaException("Erro: Nao foi possivel abrir o arquivo para salvar.");
+    throw PersistenciaException(nomeArquivo, "Nao foi possivel abrir o arquivo para salvar.");
   }
 
   arquivo << "GERENTE;" << senhaGerenteHash << "\n";
@@ -549,14 +549,14 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
   arquivo.close();
   if (arquivo.fail())
   {
-    throw AcademiaException("Erro: Falha ao gravar o arquivo de backup.");
+    throw PersistenciaException(nomeArquivo, "Falha ao gravar o arquivo de backup.");
   }
 
   std::error_code erroRename;
   std::filesystem::rename(arquivoTemporario, nomeArquivo, erroRename);
   if (erroRename)
   {
-    throw AcademiaException("Erro: Nao foi possivel substituir o arquivo de backup.");
+    throw PersistenciaException(nomeArquivo, "Nao foi possivel substituir o arquivo de backup.");
   }
 }
 
@@ -567,7 +567,7 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
 
   if (!arquivo.is_open())
   {
-    throw AcademiaException("Erro: Nao foi possivel abrir o arquivo para leitura.");
+    throw PersistenciaException(nomeArquivo, "Arquivo de dados nao encontrado.");
   }
 
   // limpa a memoria
@@ -586,153 +586,175 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
 
   std::string linha;
   // leitura do arquivo
+  int numeroLinha = 0;
+  int linhasIgnoradas = 0;
   while (std::getline(arquivo, linha))
   {
-    if (linha.empty())
-      continue;
-
-    std::stringstream ss(linha);
-    std::string tipo;
-    std::getline(ss, tipo, ';');
-
-    if (tipo == "PLANO")
+    numeroLinha++;
+    // uma linha corrompida e ignorada, sem impedir o carregamento das demais
+    try
     {
-      continue;
-    }
-    else if (tipo == "GERENTE")
-    {
-      std::string hash;
-      std::getline(ss, hash);
-      if (!hash.empty())
-        senhaGerenteHash = hash;
-    }
-    else if (tipo == "TREINO")
-    {
-      std::string idFoco, duracaoStr, exerciciosAgrupados;
-      std::getline(ss, idFoco, ';');
-      std::getline(ss, duracaoStr, ';');
-      std::getline(ss, exerciciosAgrupados);
+      if (linha.empty())
+        continue;
 
-      std::list<std::string> listaExercicios;
-      std::stringstream ssEx(exerciciosAgrupados);
-      std::string ex;
-      while (std::getline(ssEx, ex, '|'))
-      {
-        if (!ex.empty())
-          listaExercicios.push_back(ex);
-      }
+      std::stringstream ss(linha);
+      std::string tipo;
+      std::getline(ss, tipo, ';');
 
-      treinosCadastrados.push_back(new Treino(idFoco, listaExercicios, std::stoi(duracaoStr)));
-    }
-    else if (tipo == "INSTRUTOR")
-    {
-      std::string cpf, nome, email, cref, esp;
-      std::getline(ss, cpf, ';');
-      std::getline(ss, nome, ';');
-      std::getline(ss, email, ';');
-      std::string senhaHash;
-      std::getline(ss, cref, ';');
-      std::getline(ss, esp, ';');
-      std::getline(ss, senhaHash);
-
-      Instrutor *novoInstrutor = new Instrutor(nome, cpf, email, cref, esp);
-      // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
-      if (senhaHash.empty())
-        novoInstrutor->definirSenha(cpf);
-      else
-        novoInstrutor->restaurarSenhaHash(senhaHash);
-      instrutores.push_back(novoInstrutor);
-    }
-    else if (tipo == "CLIENTE")
-    {
-      std::string matStr, dataInicio, nome, cpf, email, planoId, treinoId, instrutorCpf, statusStr;
-      std::getline(ss, matStr, ';');
-      std::getline(ss, dataInicio, ';');
-      std::getline(ss, nome, ';');
-      std::getline(ss, cpf, ';');
-      std::getline(ss, email, ';');
-      std::getline(ss, planoId, ';');
-      std::getline(ss, treinoId, ';');
-      std::string senhaHash;
-      std::getline(ss, instrutorCpf, ';');
-      std::getline(ss, statusStr, ';');
-      std::getline(ss, senhaHash);
-
-      StatusMatricula status = StatusMatricula::ATIVA;
-      if (statusStr == "INADIMPLENTE") status = StatusMatricula::INADIMPLENTE;
-      else if (statusStr == "TRANCADA") status = StatusMatricula::TRANCADA;
-
-      Plano *planoCatalogo = buscarPlano(planoId);
-      Plano *p = planoCatalogo ? planoCatalogo->clone() : nullptr;
-      Treino *t = buscarTreino(treinoId);
-      Instrutor *inst = buscarInstrutor(instrutorCpf);
-
-      Cliente *novoCliente = new Cliente(nome, cpf, email, p, dataInicio);
-
-      novoCliente->restaurarMatricula(std::stoi(matStr), dataInicio, status);
-      // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
-      if (senhaHash.empty())
-        novoCliente->definirSenha(cpf);
-      else
-        novoCliente->restaurarSenhaHash(senhaHash);
-
-      if (t)
-        novoCliente->associarTreino(t);
-
-      if (inst)
-      {
-        inst->adicionarAlunoSupervisionado(novoCliente);
-      }
-
-      clientes.push_back(novoCliente);
-    }
-    else if (tipo == "PAGAMENTO")
-    {
-      std::string tipoPag, codStr, cpf, mesRef, dataPag, valorStr, statusStr;
-      std::getline(ss, tipoPag, ';');
-      std::getline(ss, codStr, ';');
-      std::getline(ss, cpf, ';');
-      std::getline(ss, mesRef, ';');
-      std::getline(ss, dataPag, ';');
-      std::getline(ss, valorStr, ';');
-      std::getline(ss, statusStr, ';');
-
-      Cliente *dono = nullptr;
-      for (Cliente *c : clientes)
-      {
-        if (c->getCpf() == cpf)
-        {
-          dono = c;
-          break;
-        }
-      }
-      if (dono == nullptr)
-        continue; // pagamento de cliente inexistente e ignorado
-
-      Pagamento *p = nullptr;
-      if (tipoPag == "PIX")
-      {
-        std::string chave, descontoStr;
-        std::getline(ss, chave, ';');
-        std::getline(ss, descontoStr);
-        p = new PagamentoPix(dono, mesRef, dataPag, chave, std::stod(descontoStr));
-      }
-      else if (tipoPag == "CARTAO")
-      {
-        std::string parcelasStr, digitos;
-        std::getline(ss, parcelasStr, ';');
-        std::getline(ss, digitos);
-        p = new PagamentoCartao(dono, mesRef, dataPag, std::stoi(parcelasStr), digitos);
-      }
-      else
+      if (tipo == "PLANO")
       {
         continue;
       }
+      else if (tipo == "GERENTE")
+      {
+        std::string hash;
+        std::getline(ss, hash);
+        if (!hash.empty())
+          senhaGerenteHash = hash;
+      }
+      else if (tipo == "TREINO")
+      {
+        std::string idFoco, duracaoStr, exerciciosAgrupados;
+        std::getline(ss, idFoco, ';');
+        std::getline(ss, duracaoStr, ';');
+        std::getline(ss, exerciciosAgrupados);
 
-      // restaura sem revalidar: o pagamento ja passou pelas regras quando foi registrado
-      p->restaurar(std::stoi(codStr), std::stod(valorStr), Pagamento::textoParaStatus(statusStr));
-      pagamentos.push_back(p);
+        std::list<std::string> listaExercicios;
+        std::stringstream ssEx(exerciciosAgrupados);
+        std::string ex;
+        while (std::getline(ssEx, ex, '|'))
+        {
+          if (!ex.empty())
+            listaExercicios.push_back(ex);
+        }
+
+        treinosCadastrados.push_back(new Treino(idFoco, listaExercicios, std::stoi(duracaoStr)));
+      }
+      else if (tipo == "INSTRUTOR")
+      {
+        std::string cpf, nome, email, cref, esp;
+        std::getline(ss, cpf, ';');
+        std::getline(ss, nome, ';');
+        std::getline(ss, email, ';');
+        std::string senhaHash;
+        std::getline(ss, cref, ';');
+        std::getline(ss, esp, ';');
+        std::getline(ss, senhaHash);
+
+        Instrutor *novoInstrutor = new Instrutor(nome, cpf, email, cref, esp);
+        // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
+        if (senhaHash.empty())
+          novoInstrutor->definirSenha(cpf);
+        else
+          novoInstrutor->restaurarSenhaHash(senhaHash);
+        instrutores.push_back(novoInstrutor);
+      }
+      else if (tipo == "CLIENTE")
+      {
+        std::string matStr, dataInicio, nome, cpf, email, planoId, treinoId, instrutorCpf, statusStr;
+        std::getline(ss, matStr, ';');
+        std::getline(ss, dataInicio, ';');
+        std::getline(ss, nome, ';');
+        std::getline(ss, cpf, ';');
+        std::getline(ss, email, ';');
+        std::getline(ss, planoId, ';');
+        std::getline(ss, treinoId, ';');
+        std::string senhaHash;
+        std::getline(ss, instrutorCpf, ';');
+        std::getline(ss, statusStr, ';');
+        std::getline(ss, senhaHash);
+
+        StatusMatricula status = StatusMatricula::ATIVA;
+        if (statusStr == "INADIMPLENTE") status = StatusMatricula::INADIMPLENTE;
+        else if (statusStr == "TRANCADA") status = StatusMatricula::TRANCADA;
+
+        Plano *planoCatalogo = buscarPlano(planoId);
+        Plano *p = planoCatalogo ? planoCatalogo->clone() : nullptr;
+        Treino *t = buscarTreino(treinoId);
+        Instrutor *inst = buscarInstrutor(instrutorCpf);
+
+        int codigoMatricula = std::stoi(matStr);
+        Cliente *novoCliente = new Cliente(nome, cpf, email, p, dataInicio);
+
+        novoCliente->restaurarMatricula(codigoMatricula, dataInicio, status);
+        // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
+        if (senhaHash.empty())
+          novoCliente->definirSenha(cpf);
+        else
+          novoCliente->restaurarSenhaHash(senhaHash);
+
+        if (t)
+          novoCliente->associarTreino(t);
+
+        if (inst)
+        {
+          inst->adicionarAlunoSupervisionado(novoCliente);
+        }
+
+        clientes.push_back(novoCliente);
+      }
+      else if (tipo == "PAGAMENTO")
+      {
+        std::string tipoPag, codStr, cpf, mesRef, dataPag, valorStr, statusStr;
+        std::getline(ss, tipoPag, ';');
+        std::getline(ss, codStr, ';');
+        std::getline(ss, cpf, ';');
+        std::getline(ss, mesRef, ';');
+        std::getline(ss, dataPag, ';');
+        std::getline(ss, valorStr, ';');
+        std::getline(ss, statusStr, ';');
+
+        Cliente *dono = nullptr;
+        for (Cliente *c : clientes)
+        {
+          if (c->getCpf() == cpf)
+          {
+            dono = c;
+            break;
+          }
+        }
+        if (dono == nullptr)
+          continue; // pagamento de cliente inexistente e ignorado
+
+        int codigoLido = std::stoi(codStr);
+        double valorLido = std::stod(valorStr);
+        StatusPagamento statusLido = Pagamento::textoParaStatus(statusStr);
+
+        Pagamento *p = nullptr;
+        if (tipoPag == "PIX")
+        {
+          std::string chave, descontoStr;
+          std::getline(ss, chave, ';');
+          std::getline(ss, descontoStr);
+          p = new PagamentoPix(dono, mesRef, dataPag, chave, std::stod(descontoStr));
+        }
+        else if (tipoPag == "CARTAO")
+        {
+          std::string parcelasStr, digitos;
+          std::getline(ss, parcelasStr, ';');
+          std::getline(ss, digitos);
+          p = new PagamentoCartao(dono, mesRef, dataPag, std::stoi(parcelasStr), digitos);
+        }
+        else
+        {
+          continue;
+        }
+
+        // restaura sem revalidar: o pagamento ja passou pelas regras quando foi registrado
+        p->restaurar(codigoLido, valorLido, statusLido);
+        pagamentos.push_back(p);
+      }
+    }
+    catch (const std::exception &e)
+    {
+      linhasIgnoradas++;
+      std::cout << "Aviso: linha " << numeroLinha << " do arquivo ignorada (" << e.what() << ")." << std::endl;
     }
   }
   arquivo.close();
+
+  if (linhasIgnoradas > 0)
+  {
+    std::cout << "Aviso: " << linhasIgnoradas << " linha(s) do arquivo de dados foram ignoradas." << std::endl;
+  }
 }

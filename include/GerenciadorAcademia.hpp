@@ -8,7 +8,7 @@
 #include "Plano.hpp"
 #include "PlanoMensal.hpp"
 #include "PlanoAnual.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 #include "Treino.hpp"
 #include "Pagamento.hpp"
 #include "PagamentoPix.hpp"

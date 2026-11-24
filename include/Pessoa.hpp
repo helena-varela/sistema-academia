@@ -2,7 +2,7 @@
 #define PESSOA_HPP
 
 #include <string>
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 class Pessoa {
     private:

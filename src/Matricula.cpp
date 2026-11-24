@@ -14,7 +14,7 @@ void Matricula::alterarEstado(StatusMatricula novoEstado) //Função de Alteraç
 {
     if (!validarTransicao(statusAtual, novoEstado)) //Chama validação: se true, permite, se false, lança exceção
     {
-        throw AcademiaException("Transicao de estado invalida.");
+        throw TransicaoEstadoInvalidaException("Matricula", statusParaTexto(statusAtual), statusParaTexto(novoEstado));
     }
 
     statusAtual = novoEstado;
@@ -24,7 +24,8 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
 {
     if (atual == novoEstado) //Não é permitido o mesmo estado
     {
-        throw AcademiaException("Esse ja e o estado atual da matricula");
+        throw TransicaoEstadoInvalidaException("Matricula", statusParaTexto(atual), statusParaTexto(novoEstado),
+                                               "Esse ja e o estado atual da matricula.");
     }
     switch (atual)
     {
@@ -47,7 +48,7 @@ bool Matricula::validarTransicao(StatusMatricula atual, StatusMatricula novoEsta
             } 
             break;
     }
-    throw AcademiaException("Transicao de estado invalida.");
+    throw TransicaoEstadoInvalidaException("Matricula", statusParaTexto(atual), statusParaTexto(novoEstado));
 }
 
 StatusMatricula Matricula::getStatus() const //getter de status
@@ -71,4 +72,15 @@ void Matricula::setCodigoEData(int codigo, const std::string& data, StatusMatric
 
 std::string Matricula::getDataInicio() const {
     return dataInicio;
+}
+
+std::string Matricula::statusParaTexto(StatusMatricula status)
+{
+    switch (status)
+    {
+        case StatusMatricula::ATIVA:        return "ATIVA";
+        case StatusMatricula::INADIMPLENTE: return "INADIMPLENTE";
+        case StatusMatricula::TRANCADA:     return "TRANCADA";
+    }
+    return "DESCONHECIDO";
 }

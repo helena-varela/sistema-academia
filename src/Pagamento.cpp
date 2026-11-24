@@ -13,19 +13,19 @@ Pagamento::Pagamento(Cliente* cliente, const std::string& mesReferencia, const s
 {
     if (cliente == nullptr)
     {
-        throw AcademiaException("Pagamento precisa estar associado a um cliente.");
+        throw DadosInvalidosException("cliente", "Pagamento precisa estar associado a um cliente.");
     }
     if (!UtilData::mesValido(mesReferencia))
     {
-        throw AcademiaException("Mes de referencia invalido (use MM/AAAA).");
+        throw DadosInvalidosException("mes de referencia", "Mes de referencia invalido (use MM/AAAA).");
     }
     if (!UtilData::dataValida(dataPagamento))
     {
-        throw AcademiaException("Data de pagamento invalida (use DD/MM/AAAA).");
+        throw DadosInvalidosException("data de pagamento", "Data de pagamento invalida (use DD/MM/AAAA).");
     }
     if (cliente->getPlanoAtual() == nullptr)
     {
-        throw AcademiaException("Cliente sem plano nao pode realizar pagamento.");
+        throw DadosInvalidosException("plano", "Cliente sem plano nao pode realizar pagamento.");
     }
     // o valor cobrado e a mensalidade do plano atual do cliente (polimorfismo de Plano)
     valorBase = cliente->getPlanoAtual()->calcularMensalidade();
@@ -40,7 +40,7 @@ void Pagamento::validar() const
     // Regra: matricula trancada nao recebe pagamentos
     if (cliente->getMatricula().getStatus() == StatusMatricula::TRANCADA)
     {
-        throw AcademiaException("Matricula trancada nao pode receber pagamentos.");
+        throw PagamentoRecusadoException(getTipo(), "Matricula trancada nao pode receber pagamentos.");
     }
 
     validarEspecifico();
@@ -66,8 +66,7 @@ void Pagamento::alterarStatus(StatusPagamento novoStatus)
 
     if (!permitido)
     {
-        throw AcademiaException("Transicao invalida do pagamento: " + statusParaTexto(status) +
-                                " -> " + statusParaTexto(novoStatus) + ".");
+        throw TransicaoEstadoInvalidaException("Pagamento", statusParaTexto(status), statusParaTexto(novoStatus));
     }
     status = novoStatus;
 }
@@ -81,7 +80,8 @@ void Pagamento::cancelar()
 {
     if (status != StatusPagamento::PENDENTE)
     {
-        throw AcademiaException("Apenas pagamentos pendentes podem ser cancelados.");
+        throw TransicaoEstadoInvalidaException("Pagamento", statusParaTexto(status), "CANCELADO",
+                                               "Apenas pagamentos pendentes podem ser cancelados.");
     }
     alterarStatus(StatusPagamento::CANCELADO);
 }
@@ -90,7 +90,8 @@ void Pagamento::estornar()
 {
     if (status != StatusPagamento::CONFIRMADO)
     {
-        throw AcademiaException("Apenas pagamentos confirmados podem ser estornados.");
+        throw TransicaoEstadoInvalidaException("Pagamento", statusParaTexto(status), "ESTORNADO",
+                                               "Apenas pagamentos confirmados podem ser estornados.");
     }
     alterarStatus(StatusPagamento::ESTORNADO);
 }
@@ -107,7 +108,7 @@ void Pagamento::reassociarCliente(Cliente* novoCliente)
 {
     if (novoCliente == nullptr)
     {
-        throw AcademiaException("Cliente invalido.");
+        throw DadosInvalidosException("cliente", "Cliente invalido.");
     }
     cliente = novoCliente;
 }
@@ -149,5 +150,5 @@ StatusPagamento Pagamento::textoParaStatus(const std::string& texto)
     if (texto == "CONFIRMADO") return StatusPagamento::CONFIRMADO;
     if (texto == "CANCELADO")  return StatusPagamento::CANCELADO;
     if (texto == "ESTORNADO")  return StatusPagamento::ESTORNADO;
-    throw AcademiaException("Status de pagamento desconhecido: " + texto);
+    throw DadosInvalidosException("status", "Status de pagamento desconhecido: " + texto);
 }

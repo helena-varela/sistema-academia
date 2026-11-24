@@ -1,5 +1,5 @@
 #include "PlanoAnual.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 #include <iostream>
 
 PlanoAnual::PlanoAnual(double preco, int meses, double desconto) 
@@ -13,7 +13,7 @@ double PlanoAnual::calcularMensalidade() {
 
 bool PlanoAnual::aplicarRestricaoAcesso(int horaAcesso) {
  if(horaAcesso < 0 || horaAcesso > 23) {
-  throw AcademiaException("Hora invalida!");
+  throw DadosInvalidosException("hora", "Hora invalida! Use um valor de 0 a 23.");
  }
   return true;
 }

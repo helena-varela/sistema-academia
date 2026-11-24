@@ -13,9 +13,12 @@ double PlanoMensal::calcularMensalidade() {
 } 
 
 bool PlanoMensal::aplicarRestricaoAcesso(int horaAcesso) {
+  if(horaAcesso < 0 || horaAcesso > 23) {
+    throw DadosInvalidosException("hora", "Hora invalida! Use um valor de 0 a 23.");
+  }
   if(horaAcesso >= 18 && horaAcesso <= 20) 
   {
-    throw AcademiaException("Horario de pico. Acesso bloqueado!");
+    throw AcessoNegadoException("treino", "Horario de pico (18h as 20h): acesso bloqueado para o Plano Mensal.");
   }
   return true;
 }

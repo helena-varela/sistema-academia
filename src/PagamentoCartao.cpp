@@ -15,17 +15,17 @@ PagamentoCartao::PagamentoCartao(Cliente* cliente,
 {
     if (numeroParcelas < 1)
     {
-        throw AcademiaException("Numero de parcelas deve ser no minimo 1.");
+        throw DadosInvalidosException("parcelas", "Numero de parcelas deve ser no minimo 1.");
     }
     if (ultimos4Digitos.size() != 4)
     {
-        throw AcademiaException("Informe os 4 ultimos digitos do cartao.");
+        throw DadosInvalidosException("cartao", "Informe os 4 ultimos digitos do cartao.");
     }
     for (char c : ultimos4Digitos)
     {
         if (!std::isdigit(static_cast<unsigned char>(c)))
         {
-            throw AcademiaException("Os ultimos digitos do cartao devem ser numericos.");
+            throw DadosInvalidosException("cartao", "Os ultimos digitos do cartao devem ser numericos.");
         }
     }
 }
@@ -36,7 +36,7 @@ void PagamentoCartao::validarEspecifico() const
     int maxParcelas = cliente->getPlanoAtual()->getMaxParcelasCartao();
     if (numeroParcelas > maxParcelas)
     {
-        throw AcademiaException("O " + cliente->getPlanoAtual()->getTipoPlano() +
+        throw PagamentoRecusadoException(getTipo(), "O " + cliente->getPlanoAtual()->getTipoPlano() +
                                 " permite no maximo " + std::to_string(maxParcelas) + " parcela(s).");
     }
 }

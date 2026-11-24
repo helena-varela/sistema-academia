@@ -2,7 +2,7 @@
 #define MATRICULA_HPP
 
 #include <string>
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 enum class StatusMatricula
 {
@@ -26,6 +26,7 @@ class Matricula
         StatusMatricula getStatus() const;
         void setCodigoEData(int codigo, const std::string& data, StatusMatricula status);
         std::string getDataInicio() const;
+        static std::string statusParaTexto(StatusMatricula status);
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include "UtilData.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 #include <cctype>
 #include <cstdio>
@@ -39,7 +39,7 @@ namespace UtilData
     {
         if (!dataValida(data))
         {
-            throw AcademiaException("Data invalida: " + data + " (use DD/MM/AAAA).");
+            throw DadosInvalidosException("data", "Data invalida: " + data + " (use DD/MM/AAAA).");
         }
         return data.substr(3);
     }
@@ -48,7 +48,7 @@ namespace UtilData
     {
         if (!dataValida(data))
         {
-            throw AcademiaException("Data invalida: " + data + " (use DD/MM/AAAA).");
+            throw DadosInvalidosException("data", "Data invalida: " + data + " (use DD/MM/AAAA).");
         }
         return std::stoi(data.substr(0, 2));
     }

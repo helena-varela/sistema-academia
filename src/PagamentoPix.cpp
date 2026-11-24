@@ -13,7 +13,7 @@ PagamentoPix::PagamentoPix(Cliente* cliente,
 {
     if (chavePix.empty())
     {
-        throw AcademiaException("Chave Pix nao pode ser vazia.");
+        throw DadosInvalidosException("chave pix", "Chave Pix nao pode ser vazia.");
     }
 }
 
@@ -21,7 +21,7 @@ void PagamentoPix::validarEspecifico() const
 {
     if (percentualDesconto < 0.0 || percentualDesconto > 0.10)
     {
-        throw AcademiaException("Desconto do Pix deve estar entre 0% e 10%.");
+        throw DadosInvalidosException("desconto", "Desconto do Pix deve estar entre 0% e 10%.");
     }
 }
 

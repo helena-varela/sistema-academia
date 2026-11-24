@@ -2,7 +2,7 @@
 #define PLANOMENSAL_HPP
 
 #include "Plano.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 class PlanoMensal : public Plano
 {

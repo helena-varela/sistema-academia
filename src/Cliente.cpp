@@ -11,7 +11,7 @@ Cliente::Cliente(const std::string& nome,
       matricula(dataInicio)
 {
     if(plano == nullptr) {
-        throw AcademiaException("Cliente nao pode ser cadastrado sem um plano valido.");
+        throw DadosInvalidosException("plano", "Cliente nao pode ser cadastrado sem um plano valido.");
     }
 }
 
@@ -24,7 +24,7 @@ void Cliente::associarTreino(Treino* treino)
 {
     if (treino == nullptr)
     {
-        throw AcademiaException("Treino invalido.");
+        throw DadosInvalidosException("treino", "Treino invalido.");
     }
     treinoDesignado = treino;
 }
@@ -33,7 +33,7 @@ void Cliente::setNome(const std::string& nome)
 {
     if (nome.empty())
     {
-        throw AcademiaException("Nome nao pode ser vazio.");
+        throw DadosInvalidosException("nome", "Nome nao pode ser vazio.");
     }
 
     this->nome = nome;
@@ -43,7 +43,7 @@ void Cliente::setCPF(const std::string& cpf)
 {
     if (!validarCPF(cpf))
     {
-        throw AcademiaException("CPF invalido.");
+        throw DadosInvalidosException("cpf", "CPF invalido.");
     }
 
     this->cpf = cpf;
@@ -53,7 +53,7 @@ void Cliente::setEmail(const std::string& email)
 {
     if (email.empty())
     {
-        throw AcademiaException("Email nao pode ser vazio.");
+        throw DadosInvalidosException("email", "Email nao pode ser vazio.");
     }
 
     this->email = email;
@@ -63,7 +63,7 @@ void Cliente::setPlano(Plano* plano)
 {
     if (plano == nullptr)
     {
-        throw AcademiaException("Plano invalido.");
+        throw DadosInvalidosException("plano", "Plano invalido.");
     }
     delete planoAtual;
     planoAtual = plano;
@@ -140,17 +140,17 @@ void Cliente::iniciarTreino(int horaAcesso) const
 {
     if (treinoDesignado == nullptr)
     {
-        throw AcademiaException("Voce precisa ter um treino designado antes de inicia-lo.");
+        throw AcessoNegadoException("treino", "Voce precisa ter um treino designado antes de inicia-lo.");
     }
 
     // Regra: apenas matriculas ativas podem treinar
     if (matricula.getStatus() == StatusMatricula::INADIMPLENTE)
     {
-        throw AcademiaException("Acesso bloqueado: matricula inadimplente. Regularize o pagamento.");
+        throw AcessoNegadoException("treino", "Acesso bloqueado: matricula inadimplente. Regularize o pagamento.");
     }
     if (matricula.getStatus() == StatusMatricula::TRANCADA)
     {
-        throw AcademiaException("Acesso bloqueado: matricula trancada.");
+        throw AcessoNegadoException("treino", "Acesso bloqueado: matricula trancada.");
     }
 
     // Regra: restricao de horario depende do plano (polimorfismo)

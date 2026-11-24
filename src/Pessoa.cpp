@@ -12,17 +12,17 @@ Pessoa::Pessoa(const std::string& nome,
 {
     if (nome.empty())
     {
-        throw AcademiaException("Nome nao pode ser vazio.");
+        throw DadosInvalidosException("nome", "Nome nao pode ser vazio.");
     }
 
     if (email.empty())
     {
-        throw AcademiaException("Email nao pode ser vazio.");
+        throw DadosInvalidosException("email", "Email nao pode ser vazio.");
     }
 
     if (!validarCPF(cpf))
     {
-        throw AcademiaException("CPF invalido.");
+        throw DadosInvalidosException("cpf", "CPF invalido (deve ter 11 digitos).");
     }
 }
 
@@ -64,7 +64,7 @@ void Pessoa::definirSenha(const std::string& senha)
 {
     if (senha.size() < 4)
     {
-        throw AcademiaException("A senha deve ter pelo menos 4 caracteres.");
+        throw DadosInvalidosException("senha", "A senha deve ter pelo menos 4 caracteres.");
     }
     senhaHash = gerarHash(senha);
 }
@@ -73,7 +73,7 @@ void Pessoa::alterarSenha(const std::string& senhaAtual, const std::string& nova
 {
     if (!autenticar(senhaAtual))
     {
-        throw AcademiaException("Senha atual incorreta.");
+        throw AutenticacaoException("usuario", "Senha atual incorreta.");
     }
     definirSenha(novaSenha);
 }

@@ -17,13 +17,7 @@ using std::vector;
 
 static string statusMatriculaTexto(StatusMatricula status)
 {
-    switch (status)
-    {
-        case StatusMatricula::ATIVA:        return "ATIVA";
-        case StatusMatricula::INADIMPLENTE: return "INADIMPLENTE";
-        case StatusMatricula::TRANCADA:     return "TRANCADA";
-    }
-    return "DESCONHECIDO";
+    return Matricula::statusParaTexto(status);
 }
 
 static void imprimirPagamento(const Pagamento* p)
@@ -60,7 +54,7 @@ static int lerCodigoPagamento()
     {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        throw AcademiaException("Codigo invalido.");
+        throw DadosInvalidosException("codigo", "Codigo invalido.");
     }
     return codigo;
 }
@@ -110,7 +104,7 @@ static void painelRegistrarPagamento(GerenciadorAcademia& gerenciador)
     {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        throw AcademiaException("Forma de pagamento invalida.");
+        throw DadosInvalidosException("forma de pagamento", "Forma de pagamento invalida.");
     }
 
     gerenciador.registrarPagamento(pagamento); // em caso de erro o gerenciador libera o objeto
@@ -158,7 +152,7 @@ static void lerAlteracaoSenha(string& senhaAtual, string& novaSenha)
     cin >> confirmacao;
     if (novaSenha != confirmacao)
     {
-        throw AcademiaException("As senhas nao conferem.");
+        throw DadosInvalidosException("senha", "As senhas nao conferem.");
     }
 }
 
@@ -183,7 +177,7 @@ void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
         cin >> opcao;
         if (opcao < 0 || opcao > 7)
         {
-            throw AcademiaException("Opcao invalida!");
+            throw DadosInvalidosException("opcao", "Opcao invalida!");
         }
 
         switch (opcao)
@@ -214,7 +208,7 @@ void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
             case 4:
                 cout << "====== Seu Treino Atual ======" << endl;
                 if (cliente.getTreinoDesignado() == nullptr){
-                    throw AcademiaException("Voce ainda nao possui um treino designado.");
+                    throw RegistroNaoEncontradoException("Treino", "nenhum treino designado para voce");
                 }
                 cout << "Foco: " << cliente.getTreinoDesignado()->getFoco() << endl;
                 cout << "Exercícios: " << *cliente.getTreinoDesignado() << endl;
@@ -255,7 +249,7 @@ void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
                 cout << "Retornando ao menu principal..." << endl;
                 break;
             default:
-                throw AcademiaException("Opção Invalida");
+                throw DadosInvalidosException("opcao", "Opcao invalida!");
         }
     }
     while (opcao != 0); 
@@ -282,7 +276,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
     cin >> opcao;
     if (opcao < 0 || opcao > 5)
     {
-        throw AcademiaException("Opcao invalida!");
+        throw DadosInvalidosException("opcao", "Opcao invalida!");
     }
 
         switch (opcao)
@@ -301,7 +295,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
                 cin >> escolha;
                 if (escolha != 1 && escolha != 2)
                 {
-                    throw AcademiaException("Opcao invalida!");
+                    throw DadosInvalidosException("opcao", "Opcao invalida!");
                 }
                 else if (escolha == 1)
                 {
@@ -359,7 +353,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
                 cin >> escolha;
                 if (escolha != 1 && escolha != 2)
                 {
-                    throw AcademiaException("Opcao invalida!");
+                    throw DadosInvalidosException("opcao", "Opcao invalida!");
                 }
                 else if (escolha == 1)
                 {
@@ -404,7 +398,7 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
                 cout << "Retornando ao menu principal..." << endl;
                 break;
             default:
-                throw AcademiaException("Opção Inválida");
+                throw DadosInvalidosException("opcao", "Opcao invalida!");
         }
         gerenciador.salvarEmArquivo(ARQUIVO_BACKUP); // salva apos cada operacao
     }
@@ -442,7 +436,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
     cin >> opcao;
     if (opcao < 0 || opcao > 16)
     {
-        throw AcademiaException("Opcao invalida!");
+        throw DadosInvalidosException("opcao", "Opcao invalida!");
     }
 
     switch (opcao)
@@ -508,7 +502,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> escolha;
                     if (escolha != 1 && escolha != 2)
                     {
-                        throw AcademiaException("Opcao invalida!");
+                        throw DadosInvalidosException("opcao", "Opcao invalida!");
                     }
                     else if (escolha == 1)
                     {
@@ -517,7 +511,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                         cin >> choice;
                         if (choice < 1 || choice > 5)
                         {
-                            throw AcademiaException("Opcao invalida!");
+                            throw DadosInvalidosException("opcao", "Opcao invalida!");
                         }
                         switch(choice)
                         {
@@ -529,7 +523,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, nomeNovo);
                                     if (nomeNovo.empty())
                                     {
-                                        throw AcademiaException("Nome inválido");
+                                        throw DadosInvalidosException("nome", "Nome inválido");
                                     }
                                     else
                                     {
@@ -544,10 +538,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     cin >> cpfNovo;
                                     bool cpfEmUso = true;
                                     try { gerenciador.consultarCliente(cpfNovo); }
-                                    catch (const AcademiaException&) { cpfEmUso = false; }
+                                    catch (const RegistroNaoEncontradoException&) { cpfEmUso = false; }
 
                                     if (cpfEmUso) {
-                                        throw AcademiaException("Erro: Ja existe um cliente cadastrado com este CPF.");
+                                        throw RegistroDuplicadoException("cliente", "o CPF " + cpfNovo);
                                     }
                                     cliente->setCPF(cpfNovo);  
                                     break;
@@ -560,7 +554,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, emailNovo);
                                     if (emailNovo.empty())
                                     {
-                                        throw AcademiaException("Email inválido");
+                                        throw DadosInvalidosException("email", "Email inválido");
                                     }
                                     else
                                     {
@@ -576,7 +570,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, planoNovoTipo);
                                     if (planoNovoTipo.empty() || (planoNovoTipo != "Mensal" && planoNovoTipo != "Anual"))
                                     {
-                                        throw AcademiaException("Tipo de Plano inválido");
+                                        throw DadosInvalidosException("plano", "Tipo de Plano inválido");
                                     }
                                     else
                                     {
@@ -607,7 +601,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     cin >> novoEstado;
                                     if (novoEstado < 1 || novoEstado > 3)
                                     {
-                                        throw AcademiaException("Opcao invalida!");
+                                        throw DadosInvalidosException("opcao", "Opcao invalida!");
                                     }
                                     switch (novoEstado)
                                     {
@@ -644,7 +638,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> escolha;
                     if (escolha != 1 && escolha != 2)
                     {
-                        throw AcademiaException("Opcao invalida!");
+                        throw DadosInvalidosException("opcao", "Opcao invalida!");
                     }
                     else if (escolha == 1)
                     {
@@ -673,7 +667,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     getline(cin, senha);
                     if (nome.empty() || cpf.empty() || email.empty() || cref.empty() || especialidade.empty())
                     {
-                        throw AcademiaException("Todos os campos devem ser preenchidos!");
+                        throw DadosInvalidosException("cadastro", "Todos os campos devem ser preenchidos!");
                     }
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
@@ -697,7 +691,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref invalido");
+                        throw DadosInvalidosException("cref", "Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref); 
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -714,7 +708,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref invalido");
+                        throw DadosInvalidosException("cref", "Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -726,7 +720,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> escolha;
                     if (escolha != 1 && escolha != 2)
                     {
-                        throw AcademiaException("Opcao invalida!");
+                        throw DadosInvalidosException("opcao", "Opcao invalida!");
                     }
                     else if (escolha == 1)
                     {
@@ -735,7 +729,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                         cin >> choice;
                         if (choice < 1 || choice > 4)
                         {
-                            throw AcademiaException("Opcao invalida!");
+                            throw DadosInvalidosException("opcao", "Opcao invalida!");
                         }
                         switch(choice)
                         {
@@ -747,7 +741,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, nomeNovo);
                                     if (nomeNovo.empty())
                                     {
-                                        throw AcademiaException("Nome inválido");
+                                        throw DadosInvalidosException("nome", "Nome inválido");
                                     }
                                     else
                                     {
@@ -762,10 +756,10 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     cin >> cpfNovo;
                                     bool cpfEmUso = true;
                                     try { gerenciador.consultarInstrutorPorCpf(cpfNovo); }
-                                    catch (const AcademiaException&) { cpfEmUso = false; }
+                                    catch (const RegistroNaoEncontradoException&) { cpfEmUso = false; }
 
                                     if (cpfEmUso) {
-                                        throw AcademiaException("Erro: Ja existe um instrutor cadastrado com este CPF.");
+                                        throw RegistroDuplicadoException("instrutor", "o CPF " + cpfNovo);
                                     }
                                     instrutor->setCPF(cpfNovo);  
                                     break;
@@ -778,7 +772,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, emailNovo);
                                     if (emailNovo.empty())
                                     {
-                                        throw AcademiaException("Email inválido");
+                                        throw DadosInvalidosException("email", "Email inválido");
                                     }
                                     else
                                     {
@@ -794,7 +788,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     getline(cin, especialidadeNova);
                                     if (especialidadeNova.empty())
                                     {
-                                        throw AcademiaException("Especialidade inválida");
+                                        throw DadosInvalidosException("especialidade", "Especialidade inválida");
                                     }
                                     else
                                     {
@@ -817,7 +811,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> cref;
                     if (cref.empty())
                     {
-                        throw AcademiaException("Cref invalido");
+                        throw DadosInvalidosException("cref", "Cref invalido");
                     }
                     Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
                     cout << "Nome: " << instrutor->getNome() << endl;
@@ -829,7 +823,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cin >> escolha;
                     if (escolha != 1 && escolha != 2)
                     {
-                        throw AcademiaException("Opcao invalida!");
+                        throw DadosInvalidosException("opcao", "Opcao invalida!");
                     }
                     else if (escolha == 1)
                     {
@@ -909,7 +903,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                 cout << "Retornando ao menu principal..." << endl;
                 break;
             default:
-                throw AcademiaException("Opção Inválida");
+                throw DadosInvalidosException("opcao", "Opcao invalida!");
         }
         gerenciador.salvarEmArquivo(ARQUIVO_BACKUP); // salva apos cada operacao
     }

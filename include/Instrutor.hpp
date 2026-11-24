@@ -7,7 +7,7 @@
 #include "Pessoa.hpp"
 #include "Cliente.hpp"
 #include "Treino.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 class Instrutor : public Pessoa
 {

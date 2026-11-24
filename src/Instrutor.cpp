@@ -16,17 +16,17 @@ void Instrutor::prescreverTreino(Cliente* aluno, Treino* novoTreino)
 {
     if (aluno == nullptr)
     {
-        throw AcademiaException("Aluno invalido.");
+        throw DadosInvalidosException("aluno", "Aluno invalido.");
     }
 
     if (novoTreino == nullptr)
     {
-        throw AcademiaException("Treino invalido.");
+        throw DadosInvalidosException("treino", "Treino invalido.");
     }
 
     if (!supervisionaAluno(aluno))
     {
-        throw AcademiaException("Instrutor so pode prescrever treino para alunos supervisionados.");
+        throw AcessoNegadoException("prescricao de treino", "Instrutor so pode prescrever treino para alunos supervisionados.");
     }
 
     aluno->associarTreino(novoTreino);
@@ -36,7 +36,7 @@ void Instrutor::setNome(const std::string& nome)
 {
     if (nome.empty())
     {
-        throw AcademiaException("Nome nao pode ser vazio.");
+        throw DadosInvalidosException("nome", "Nome nao pode ser vazio.");
     }
 
     this->nome = nome;
@@ -46,7 +46,7 @@ void Instrutor::setCPF(const std::string& cpf)
 {
     if (!validarCPF(cpf))
     {
-        throw AcademiaException("CPF invalido.");
+        throw DadosInvalidosException("cpf", "CPF invalido.");
     }
 
     this->cpf = cpf;
@@ -56,7 +56,7 @@ void Instrutor::setEmail(const std::string& email)
 {
     if (email.empty())
     {
-        throw AcademiaException("Email nao pode ser vazio.");
+        throw DadosInvalidosException("email", "Email nao pode ser vazio.");
     }
 
     this->email = email;
@@ -66,7 +66,7 @@ void Instrutor::setEspecialidade(const std::string& especialidade)
 {
     if (especialidade.empty())
     {
-        throw AcademiaException("Especialidade nao pode ser vazia.");
+        throw DadosInvalidosException("especialidade", "Especialidade nao pode ser vazia.");
     }
 
     this->especialidade = especialidade;
@@ -76,7 +76,7 @@ void Instrutor::adicionarAlunoSupervisionado(Cliente* aluno)
 {
     if (aluno == nullptr)
     {
-        throw AcademiaException("Aluno invalido.");
+        throw DadosInvalidosException("aluno", "Aluno invalido.");
     }
 
     auto it = std::find(alunosSobSupervisao.begin(),
@@ -93,7 +93,7 @@ void Instrutor::removerAlunoSupervisionado(Cliente* aluno)
 {
     if (aluno == nullptr)
     {
-        throw AcademiaException("Aluno invalido.");
+        throw DadosInvalidosException("aluno", "Aluno invalido.");
     }
 
     alunosSobSupervisao.remove(aluno);
@@ -137,5 +137,5 @@ Cliente* Instrutor::consultarAlunoSupervisionado(int codigoMatricula) const
             return aluno;
         }
     }
-    throw AcademiaException("Aluno nao esta sob supervisao deste instrutor.");
+    throw RegistroNaoEncontradoException("Aluno supervisionado", "matricula " + std::to_string(codigoMatricula));
 }

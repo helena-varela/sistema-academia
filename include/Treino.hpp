@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 #include <fstream>
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 class Treino
 {

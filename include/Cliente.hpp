@@ -8,7 +8,7 @@
 #include "Plano.hpp"
 #include "Treino.hpp"
 #include "Matricula.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 class Cliente : public Pessoa
 {

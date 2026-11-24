@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Cliente.hpp"
-#include "AcademiaException.hpp"
+#include "Excecoes.hpp"
 
 enum class StatusPagamento
 {
