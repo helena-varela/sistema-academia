@@ -83,141 +83,140 @@ Contém os arquivos de extensão .cpp com a implementação real da lógica decl
 
 ## 📑 Diagrama de Classes
 
-
 ```mermaid
 classDiagram
 direction BT
     class Pessoa {
-	    -String senhaHash
-	    #String nome
-	    #String cpf
-	    #String email
-	    +definirSenha(senha)
-	    +alterarSenha(senhaAtual, novaSenha)
-	    +autenticar(senha) bool
+        -String senhaHash
+        #String nome
+        #String cpf
+        #String email
+        +definirSenha(senha)
+        +alterarSenha(senhaAtual, novaSenha)
+        +autenticar(senha) bool
     }
 
     class Plano {
-	    #double precoBase
+        #double precoBase
     }
 
     class PlanoMensal {
-	    -double taxaInscricaoAvulsa
+        -double taxaInscricaoAvulsa
     }
 
     class PlanoAnual {
-	    -int mesesFidelidade
-	    -double descontoFidelidade
+        -int mesesFidelidade
+        -double descontoFidelidade
     }
 
     class Instrutor {
-	    -String cref
-	    -String especialidade
+        -String cref
+        -String especialidade
     }
 
     class Cliente {
-	    -Plano* planoAtual
-	    -Treino* treinoDesignado
+        -Plano* planoAtual
+        -Treino* treinoDesignado
     }
 
     class Treino {
-	    -String focoMuscular
-	    -List~String~ exercicios
-	    -int duracaoEstimadaMin
+        -String focoMuscular
+        -List~String~ exercicios
+        -int duracaoEstimadaMin
     }
 
     class Matricula {
-	    -int ultimoCodigo$
-	    -int codigoMatricula
-	    -String dataInicio
+        -int ultimoCodigo$
+        -int codigoMatricula
+        -String dataInicio
     }
 
     class StatusMatricula {
-	    ATIVA
-	    INADIMPLENTE
-	    TRANCADA
+        ATIVA
+        INADIMPLENTE
+        TRANCADA
     }
 
     class GerenciadorAcademia {
-	    -Vector~Cliente*~ clientes
-	    -Vector~Instrutor*~ instrutores
-	    -Vector~Plano*~ planosCadastrados
-	    -Vector~Treino*~ treinosCadastrados
+        -Vector~Cliente~ clientes
+        -Vector~Instrutor~ instrutores
+        -Vector~Plano~ planosCadastrados
+        -Vector~Treino~ treinosCadastrados
     }
 
     class AcademiaException {
-	    -String mensagemErro
+        -String mensagemErro
     }
 
     class DadosInvalidosException {
-	    -String campo
+        -String campo
     }
     class RegistroNaoEncontradoException {
-	    -String tipoRegistro
-	    -String identificador
+        -String tipoRegistro
+        -String identificador
     }
     class RegistroDuplicadoException {
-	    -String tipoRegistro
-	    -String identificador
+        -String tipoRegistro
+        -String identificador
     }
     class TransicaoEstadoInvalidaException {
-	    -String entidade
-	    -String estadoAtual
-	    -String estadoDestino
+        -String entidade
+        -String estadoAtual
+        -String estadoDestino
     }
     class AutenticacaoException {
-	    -String perfil
+        -String perfil
     }
     class AcessoNegadoException {
-	    -String recurso
+        -String recurso
     }
     class PagamentoRecusadoException {
-	    -String formaPagamento
+        -String formaPagamento
     }
     class PersistenciaException {
-	    -String caminhoArquivo
+        -String caminhoArquivo
     }
 
     class Pagamento {
-	    -int ultimoCodigo$
-	    #int codigo
-	    #Cliente* cliente
-	    #String mesReferencia
-	    #String dataPagamento
-	    #double valorBase
-	    #StatusPagamento status
-	    +calcularValorFinal()* double
-	    +confirmacaoImediata()* bool
-	    #validarEspecifico()*
-	    +validar()
-	    +confirmar()
-	    +cancelar()
-	    +estornar()
+        -int ultimoCodigo$
+        #int codigo
+        #Cliente* cliente
+        #String mesReferencia
+        #String dataPagamento
+        #double valorBase
+        #StatusPagamento status
+        +calcularValorFinal()* double
+        +confirmacaoImediata()* bool
+        #validarEspecifico()*
+        +validar()
+        +confirmar()
+        +cancelar()
+        +estornar()
     }
 
     class PagamentoPix {
-	    -String chavePix
-	    -double percentualDesconto
+        -String chavePix
+        -double percentualDesconto
     }
 
     class PagamentoCartao {
-	    -int numeroParcelas
-	    -String ultimos4Digitos
-	    +getValorParcela() double
+        -int numeroParcelas
+        -String ultimos4Digitos
+        +getValorParcela() double
     }
 
     class StatusPagamento {
-	    PENDENTE
-	    CONFIRMADO
-	    CANCELADO
-	    ESTORNADO
+        PENDENTE
+        CONFIRMADO
+        CANCELADO
+        ESTORNADO
     }
 
-	<<abstract>> Pessoa
-	<<abstract>> Plano
-	<<enumeration>> StatusMatricula
-	<<abstract>> Pagamento
-	<<enumeration>> StatusPagamento
+    <<abstract>> Pessoa
+    <<abstract>> Plano
+    <<enumeration>> StatusMatricula
+    <<abstract>> Pagamento
+    <<enumeration>> StatusPagamento
 
     Pessoa <|-- Instrutor
     Pessoa <|-- Cliente
@@ -246,8 +245,6 @@ direction BT
     Pagamento "0..*" --> "1" Cliente : referente a
     Pagamento "1" *-- "1" StatusPagamento : tem
 ```
-<!-- <img width="7637" height="8192" alt="Cliente Management Framework-2026-06-17-013321" src="https://github.com/user-attachments/assets/66b8d54f-1f82-4c84-b334-e11a5d0b07be" /> -->
-
 
 ## 🧩 Conceitos de POO Aplicados
 
