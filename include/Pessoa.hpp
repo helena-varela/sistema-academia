@@ -13,9 +13,9 @@ class Pessoa {
         std::string cpf;
         std::string email;
 
+    public:
         static bool validarCPF(const std::string& cpf);
 
-    public:
         Pessoa(const std::string& nome,
            const std::string& cpf,
            const std::string& email);

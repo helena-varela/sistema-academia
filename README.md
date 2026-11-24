@@ -54,7 +54,7 @@ Destinada aos arquivos de texto (.txt) utilizados para salvar e carregar os dado
 
 ### 4. include/ (Cabeçalhos / Headers): 
 
-Contém os arquivos de extensão .hpp. É onde ficam as declarações das 12 classes , atributos, protótipos de métodos e as definições de exceções personalizadas. Nenhuma lógica de código deve ser escrita aqui.
+Contém os arquivos de extensão .hpp. É onde ficam as declarações das 21 classes (12 de domínio, `AcademiaException` e 8 exceções derivadas), atributos, protótipos de métodos e as definições de exceções personalizadas. Nenhuma lógica de código deve ser escrita aqui.
 
 ### 5. src/ (Fontes / Source): 
 
@@ -82,6 +82,8 @@ Contém os arquivos de extensão .cpp com a implementação real da lógica decl
 **Como funciona:** Ele remove completamente o diretório bin/ e tudo o que está dentro dele. É útil usar este comando antes de criar arquivos compactados (.zip) para entrega  ou para forçar uma compilação do zero quando ocorrer algum erro estranho de cache de arquivos.  
 
 ## 📑 Diagrama de Classes
+
+O diagrama também está disponível como imagem em [`docs/mermaid-diagram.png`](docs/mermaid-diagram.png).
 
 ```mermaid
 classDiagram
@@ -333,6 +335,8 @@ Todo acesso exige login com senha. As senhas não são gravadas em texto puro: o
 | 10 | Após o dia 10, o cliente sem pagamento confirmado do mês fica **inadimplente** (exceto quem se matriculou no próprio mês). Ao confirmar o pagamento, a matrícula volta a ficar **ativa**. | `GerenciadorAcademia::reavaliarSituacaoFinanceira`, `GerenciadorAcademia::atualizarInadimplencia` |
 
 ## 📝 Regras de Negócio Identificadas e Não Implementadas
+
+Conforme pedido na atividade, esta seção lista regras que foram identificadas durante a análise do domínio, mas ficaram fora do escopo desta entrega. Todas as funcionalidades e as 10 regras descritas acima estão implementadas.
 
 - **Multa e juros por atraso:** pagamentos feitos após o vencimento deveriam ter multa fixa e juros por dia de atraso.
 - **Juros no parcelamento:** parcelamentos longos no cartão deveriam ter juros e um valor mínimo por parcela.

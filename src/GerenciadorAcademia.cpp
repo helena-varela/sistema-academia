@@ -51,7 +51,6 @@ void GerenciadorAcademia::cadastrarCliente(Cliente *c)
     }
   }
   clientes.push_back(c);
-  std::cout << "Cliente cadastrado com sucesso!" << std::endl;
   return;
 }
 
@@ -117,7 +116,6 @@ void GerenciadorAcademia::removerCliente(const std::string &cpf)
       removerPagamentosDoCliente(clienteARemover);
       delete clientes[i];
       clientes.erase(clientes.begin() + i);
-      std::cout << "Cliente removido com sucesso!" << std::endl;
       return;
     }
   }
@@ -174,7 +172,6 @@ void GerenciadorAcademia::cadastrarInstrutor(Instrutor* i)
     }
   } 
   instrutores.push_back(i);
-  std::cout << "Instrutor cadastrado com sucesso!" << std::endl;
   return;
 }
 
@@ -184,7 +181,6 @@ void GerenciadorAcademia::removerInstrutor(const std::string& cpf)
     if(instrutores[i]->getCpf() == cpf){
       delete instrutores[i];
       instrutores.erase(instrutores.begin() + i);
-      std::cout << "Instrutor removido com sucesso!" << std::endl;
       return;
     }
   }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <iomanip>
+#include <functional>
 #include "UtilData.hpp"
 using std::cin;
 using std::cout;
@@ -13,7 +14,53 @@ using std::streamsize;
 using std::string;
 using std::vector;
 
-// ===================== funcoes auxiliares =====================
+// Le uma linha e, se a validacao lancar uma excecao do sistema, mostra o erro
+// e repete apenas aquela pergunta (sem perder os campos ja preenchidos).
+static string lerCampo(const string& pergunta, const std::function<void(const string&)>& validar)
+{
+    string valor;
+    while (true)
+    {
+        cout << pergunta;
+        if (!getline(cin, valor))
+        {
+            throw DadosInvalidosException("entrada", "Entrada encerrada.");
+        }
+        try
+        {
+            validar(valor);
+            return valor;
+        }
+        catch (const AcademiaException& e)
+        {
+            cout << "Erro: " << e.what() << " Tente novamente." << endl;
+        }
+    }
+}
+
+static void validarNaoVazio(const string& campo, const string& valor)
+{
+    if (valor.empty())
+    {
+        throw DadosInvalidosException(campo, "O campo " + campo + " nao pode ser vazio.");
+    }
+}
+
+static void validarFormatoCpf(const string& cpf)
+{
+    if (!Pessoa::validarCPF(cpf))
+    {
+        throw DadosInvalidosException("cpf", "CPF invalido (deve ter 11 digitos, somente numeros).");
+    }
+}
+
+static void validarSenhaNova(const string& senha)
+{
+    if (senha.size() < 4)
+    {
+        throw DadosInvalidosException("senha", "A senha deve ter pelo menos 4 caracteres.");
+    }
+}
 
 static string statusMatriculaTexto(StatusMatricula status)
 {
@@ -444,18 +491,25 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 1:
                 {
                     cout << "====== Painel de Cadastro (Cliente) ======" << endl;
-                    string nome, cpf, email, planoTipo, senha;
-                    cout << "Digite o Nome do Cliente: ";
-                    cin.ignore();
-                    getline(cin, nome);
-                    cout << "Digite o CPF: ";
-                    getline(cin, cpf);
-                    cout << "Digite o Email: ";
-                    getline(cin, email);
-                    cout << "Digite o Plano (Mensal/Anual): ";
-                    getline(cin, planoTipo);
-                    cout << "Defina a senha de acesso do cliente (min. 4 caracteres): ";
-                    getline(cin, senha);
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    string nome = lerCampo("Digite o Nome do Cliente: ",
+                        [](const string& v) { validarNaoVazio("nome", v); });
+                    string cpf = lerCampo("Digite o CPF: ", [&gerenciador](const string& v) {
+                        validarFormatoCpf(v);
+                        try {
+                            gerenciador.consultarCliente(v);
+                        } catch (const RegistroNaoEncontradoException&) {
+                            return; // CPF livre
+                        }
+                        throw RegistroDuplicadoException("cliente", "o CPF " + v);
+                    });
+                    string email = lerCampo("Digite o Email: ",
+                        [](const string& v) { validarNaoVazio("email", v); });
+                    string planoTipo = lerCampo("Digite o Plano (Mensal/Anual): ", [&gerenciador](const string& v) {
+                        delete gerenciador.criarPlanoDoCatalogo(v); // so verifica se o plano existe
+                    });
+                    string senha = lerCampo("Defina a senha de acesso do cliente (min. 4 caracteres): ",
+                        validarSenhaNova);
 
                     Plano* plano = gerenciador.criarPlanoDoCatalogo(planoTipo);
 
@@ -470,7 +524,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     
           
 
-                    cout << "Cliente cadastrado!" << endl;
+                    cout << "Cliente cadastrado com sucesso!" << endl;
                     cout << "=========================" << endl;
                     break;
                 }
@@ -643,7 +697,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     else if (escolha == 1)
                     {
                         gerenciador.removerCliente(cliente->getCpf());
-                        cout << "Cliente removido com sucesso" << endl;
+                        cout << "Cliente removido com sucesso!" << endl;
                     }
                     cout << "=========================" << endl; 
                     break;
@@ -651,24 +705,33 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 5:
                 {
                     cout << "====== Painel de Cadastro (Instrutor) ======" << endl;
-                    string nome, cpf, email, cref, especialidade, senha;
-                    cout << "Digite o Nome do Instrutor: ";
-                    cin.ignore();
-                    getline(cin, nome);
-                    cout << "Digite o CPF: ";
-                    getline(cin, cpf);
-                    cout << "Digite o Email: ";
-                    getline(cin, email);
-                    cout << "Digite o cref: ";
-                    getline(cin, cref);
-                    cout << "Digite a especialidade: ";
-                    getline(cin, especialidade);
-                    cout << "Defina a senha de acesso do instrutor (min. 4 caracteres): ";
-                    getline(cin, senha);
-                    if (nome.empty() || cpf.empty() || email.empty() || cref.empty() || especialidade.empty())
-                    {
-                        throw DadosInvalidosException("cadastro", "Todos os campos devem ser preenchidos!");
-                    }
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    string nome = lerCampo("Digite o Nome do Instrutor: ",
+                        [](const string& v) { validarNaoVazio("nome", v); });
+                    string cpf = lerCampo("Digite o CPF: ", [&gerenciador](const string& v) {
+                        validarFormatoCpf(v);
+                        try {
+                            gerenciador.consultarInstrutorPorCpf(v);
+                        } catch (const RegistroNaoEncontradoException&) {
+                            return; // CPF livre
+                        }
+                        throw RegistroDuplicadoException("instrutor", "o CPF " + v);
+                    });
+                    string email = lerCampo("Digite o Email: ",
+                        [](const string& v) { validarNaoVazio("email", v); });
+                    string cref = lerCampo("Digite o CREF: ", [&gerenciador](const string& v) {
+                        validarNaoVazio("CREF", v);
+                        try {
+                            gerenciador.consultarInstrutor(v);
+                        } catch (const RegistroNaoEncontradoException&) {
+                            return; // CREF livre
+                        }
+                        throw RegistroDuplicadoException("instrutor", "o CREF " + v);
+                    });
+                    string especialidade = lerCampo("Digite a especialidade: ",
+                        [](const string& v) { validarNaoVazio("especialidade", v); });
+                    string senha = lerCampo("Defina a senha de acesso do instrutor (min. 4 caracteres): ",
+                        validarSenhaNova);
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
                     try {
@@ -679,7 +742,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                         throw;
                     }
                     
-                    cout << "Instrutor cadastrado!" << endl;
+                    cout << "Instrutor cadastrado com sucesso!" << endl;
                     cout << "=========================" << endl;
                     break;
                 }
@@ -828,7 +891,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     else if (escolha == 1)
                     {
                         gerenciador.removerInstrutor(instrutor->getCpf()); 
-                        cout << "Instrutor removido com sucesso" << endl;
+                        cout << "Instrutor removido com sucesso!" << endl;
                     }
                     cout << "=========================" << endl; 
                     break;
