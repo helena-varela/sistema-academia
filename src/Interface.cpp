@@ -1,6 +1,8 @@
 #include "Interface.hpp"
 #include <iostream>
 #include <limits>
+#include <iomanip>
+#include "UtilData.hpp"
 using std::cin;
 using std::cout;
 using std::endl;
@@ -9,8 +11,150 @@ using std::list;
 using std::numeric_limits;
 using std::streamsize;
 using std::string;
+using std::vector;
 
-void interfaceCliente(Cliente& cliente)
+// ===================== funcoes auxiliares =====================
+
+static string statusMatriculaTexto(StatusMatricula status)
+{
+    switch (status)
+    {
+        case StatusMatricula::ATIVA:        return "ATIVA";
+        case StatusMatricula::INADIMPLENTE: return "INADIMPLENTE";
+        case StatusMatricula::TRANCADA:     return "TRANCADA";
+    }
+    return "DESCONHECIDO";
+}
+
+static void imprimirPagamento(const Pagamento* p)
+{
+    cout << std::fixed << std::setprecision(2);
+    cout << "[" << p->getCodigo() << "] " << p->getMesReferencia()
+         << " | " << p->getTipo()
+         << " | Pago em " << p->getDataPagamento()
+         << " | Valor base: R$ " << p->getValorBase()
+         << " | Total: R$ " << p->calcularValorFinal()
+         << " | " << p->getStatusTexto() << endl;
+    cout << "      " << p->getDescricao();
+    if (p->pagoEmAtraso())
+    {
+        cout << " | " << p->diasDeAtraso() << " dia(s) de atraso (multa aplicada)";
+    }
+    cout << endl;
+    cout.unsetf(std::ios::fixed);
+}
+
+static void imprimirHistorico(const vector<Pagamento*>& historico)
+{
+    if (historico.empty())
+    {
+        cout << "Nenhum pagamento registrado." << endl;
+        return;
+    }
+    for (const Pagamento* p : historico)
+    {
+        imprimirPagamento(p);
+    }
+}
+
+static int lerCodigoPagamento()
+{
+    int codigo;
+    cout << "Digite o codigo do pagamento: ";
+    if (!(cin >> codigo))
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        throw AcademiaException("Codigo invalido.");
+    }
+    return codigo;
+}
+
+static void painelRegistrarPagamento(GerenciadorAcademia& gerenciador)
+{
+    cout << "====== Registrar Pagamento ======" << endl;
+    string cpf;
+    cout << "CPF do cliente: ";
+    cin >> cpf;
+    Cliente* cliente = gerenciador.consultarCliente(cpf);
+    cout << "Cliente: " << cliente->getNome() << " | " << cliente->getPlanoAtual()->getTipoPlano()
+         << " | Matricula " << statusMatriculaTexto(cliente->getMatricula().getStatus()) << endl;
+
+    string mesReferencia;
+    cout << "Mes de referencia (MM/AAAA) ou 0 para o mes atual (" << UtilData::mesAtual() << "): ";
+    cin >> mesReferencia;
+    if (mesReferencia == "0")
+    {
+        mesReferencia = UtilData::mesAtual();
+    }
+
+    int forma;
+    cout << "Forma de pagamento (1. Pix, 2. Cartao): ";
+    cin >> forma;
+
+    Pagamento* pagamento = nullptr;
+    if (forma == 1)
+    {
+        string chave;
+        cout << "Chave Pix: ";
+        cin >> chave;
+        pagamento = new PagamentoPix(cliente, mesReferencia, UtilData::hoje(), chave);
+    }
+    else if (forma == 2)
+    {
+        int parcelas;
+        string digitos;
+        cout << "Numero de parcelas (max. " << cliente->getPlanoAtual()->getMaxParcelasCartao()
+             << " no " << cliente->getPlanoAtual()->getTipoPlano() << "): ";
+        cin >> parcelas;
+        cout << "4 ultimos digitos do cartao: ";
+        cin >> digitos;
+        pagamento = new PagamentoCartao(cliente, mesReferencia, UtilData::hoje(), parcelas, digitos);
+    }
+    else
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        throw AcademiaException("Forma de pagamento invalida.");
+    }
+
+    gerenciador.registrarPagamento(pagamento); // em caso de erro o gerenciador libera o objeto
+    cout << "Pagamento registrado:" << endl;
+    imprimirPagamento(pagamento);
+    if (pagamento->getStatus() == StatusPagamento::PENDENTE)
+    {
+        cout << "Pagamento no cartao aguardando autorizacao (use 'Confirmar pagamento de cartao')." << endl;
+    }
+    cout << "Situacao da matricula: " << statusMatriculaTexto(cliente->getMatricula().getStatus()) << endl;
+}
+
+static void painelRelatorioInadimplentes(GerenciadorAcademia& gerenciador)
+{
+    cout << "====== Relatorio de Inadimplentes ======" << endl;
+    vector<Cliente*> inadimplentes = gerenciador.listarInadimplentes();
+    if (inadimplentes.empty())
+    {
+        cout << "Nenhum cliente inadimplente." << endl;
+        return;
+    }
+    double totalEmAberto = 0.0;
+    cout << std::fixed << std::setprecision(2);
+    for (Cliente* c : inadimplentes)
+    {
+        double valor = c->getPlanoAtual()->calcularMensalidade();
+        totalEmAberto += valor;
+        cout << "- " << c->getNome() << " | CPF " << c->getCpf()
+             << " | " << c->getPlanoAtual()->getTipoPlano()
+             << " | Mensalidade em aberto: R$ " << valor << endl;
+    }
+    cout << "Total de clientes: " << inadimplentes.size()
+         << " | Total em aberto: R$ " << totalEmAberto << endl;
+    cout.unsetf(std::ios::fixed);
+}
+
+// ===================== menus =====================
+
+void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
 {
     int opcao;
     do 
@@ -22,10 +166,11 @@ void interfaceCliente(Cliente& cliente)
         cout << "3. Visualizar Plano Atual" << endl;
         cout << "4. Visualizar Treino" << endl;
         cout << "5. Iniciar Treino" << endl;
+        cout << "6. Meus Pagamentos" << endl;
         cout << "0. Retornar" << endl;
 
         cin >> opcao;
-        if (opcao < 0 || opcao > 5)
+        if (opcao < 0 || opcao > 6)
         {
             throw AcademiaException("Opcao invalida!");
         }
@@ -42,6 +187,8 @@ void interfaceCliente(Cliente& cliente)
             case 2:
                 cout << "====== Seu ID ======" << endl;
                 cout << "Matrícula: " << cliente.getCodigoMatricula() << endl;
+                cout << "Inicio: " << cliente.getDataInicio() << endl;
+                cout << "Situacao: " << statusMatriculaTexto(cliente.getMatricula().getStatus()) << endl;
                 cout << "=========================" << endl;
                 break;
             case 3:
@@ -65,13 +212,10 @@ void interfaceCliente(Cliente& cliente)
                 break;
             case 5:
             {
-                if (cliente.getTreinoDesignado() == nullptr) {       // <- ADICIONAR: mesma proteção aqui
-                    throw AcademiaException("Voce precisa ter um treino designado antes de inicia-lo.");
-                }
                 cout << "Digite o horário de acesso (0-23): ";
                 int horaAcesso;
                 cin >> horaAcesso;
-                if(cliente.getPlanoAtual()->aplicarRestricaoAcesso(horaAcesso))
+                cliente.iniciarTreino(horaAcesso); // lanca excecao se o acesso nao for permitido
                 {
                     cout << cliente.getPlanoAtual()->getTipoPlano() << ". Acesso liberado!" << endl;
                     cout << "====== Iniciando Treino ======" << endl;
@@ -82,6 +226,11 @@ void interfaceCliente(Cliente& cliente)
                 }
                 break;
             }
+            case 6:
+                cout << "====== Meus Pagamentos ======" << endl;
+                imprimirHistorico(gerenciador.historicoPagamentos(cliente.getCpf()));
+                cout << "=========================" << endl;
+                break;
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;
@@ -249,10 +398,18 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
     cout << "6. Consultar Instrutor" << endl;
     cout << "7. Atualizar Instrutor" << endl;
     cout << "8. Remover Instrutor" << endl;
+    cout << "---------- Financeiro ----------" << endl;
+    cout << "9. Registrar Pagamento" << endl;
+    cout << "10. Confirmar Pagamento de Cartao" << endl;
+    cout << "11. Cancelar Pagamento Pendente" << endl;
+    cout << "12. Estornar Pagamento" << endl;
+    cout << "13. Historico de Pagamentos do Cliente" << endl;
+    cout << "14. Atualizar Inadimplencia do Mes" << endl;
+    cout << "15. Relatorio de Inadimplentes" << endl;
     cout << "0. Retornar" << endl;
 
     cin >> opcao;
-    if (opcao < 0 || opcao > 8)
+    if (opcao < 0 || opcao > 15)
     {
         throw AcademiaException("Opcao invalida!");
     }
@@ -273,14 +430,9 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "Digite o Plano (Mensal/Anual): ";
                     getline(cin, planoTipo);
 
-                    Plano* plano = nullptr;
-                    if (planoTipo == "Mensal") {
-                        plano = new PlanoMensal(100.00, 10.00);
-                    } else if (planoTipo == "Anual") {
-                        plano = new PlanoAnual(90.00, 0, 0.0);
-                    }
+                    Plano* plano = gerenciador.criarPlanoDoCatalogo(planoTipo);
 
-                    Cliente* c = new Cliente(nome, cpf, email, plano, "01/01/2026");
+                    Cliente* c = new Cliente(nome, cpf, email, plano, UtilData::hoje());
                     try {
                         gerenciador.cadastrarCliente(c);
                     } catch (...){
@@ -394,35 +546,8 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                                     }
                                     else
                                     {
-                                        Plano* planoNovo = nullptr;
-                                        if (planoNovoTipo == "Mensal")
-                                        {
-                                            double preco, taxa;
-
-                                            cout << "Preco base: ";
-                                            cin >> preco;
-
-                                            cout << "Taxa de inscricao: ";
-                                            cin >> taxa;
-
-                                            planoNovo = new PlanoMensal(preco, taxa);
-                                        }
-                                        else if (planoNovoTipo == "Anual")
-                                        {
-                                            double preco, desconto;
-                                            int meses;
-
-                                            cout << "Preco base: ";
-                                            cin >> preco;
-
-                                            cout << "Meses de fidelidade: ";
-                                            cin >> meses;
-
-                                            cout << "Desconto: ";
-                                            cin >> desconto;
-
-                                            planoNovo = new PlanoAnual(preco, meses, desconto);
-                                        }
+                                        // usa o plano do catalogo, o mesmo que e restaurado do backup
+                                        Plano* planoNovo = gerenciador.criarPlanoDoCatalogo(planoNovoTipo);
                                         cliente->setPlano(planoNovo);  
                                     }
                                     break;
@@ -677,6 +802,63 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     cout << "=========================" << endl; 
                     break;
                 }
+            case 9:
+                painelRegistrarPagamento(gerenciador);
+                break;
+            case 10:
+                {
+                    cout << "====== Confirmar Pagamento de Cartao ======" << endl;
+                    int codigo = lerCodigoPagamento();
+                    gerenciador.confirmarPagamento(codigo);
+                    cout << "Pagamento confirmado:" << endl;
+                    imprimirPagamento(gerenciador.consultarPagamento(codigo));
+                    break;
+                }
+            case 11:
+                {
+                    cout << "====== Cancelar Pagamento Pendente ======" << endl;
+                    int codigo = lerCodigoPagamento();
+                    gerenciador.cancelarPagamento(codigo);
+                    cout << "Pagamento cancelado." << endl;
+                    break;
+                }
+            case 12:
+                {
+                    cout << "====== Estornar Pagamento ======" << endl;
+                    int codigo = lerCodigoPagamento();
+                    gerenciador.estornarPagamento(codigo);
+                    Pagamento* p = gerenciador.consultarPagamento(codigo);
+                    cout << "Pagamento estornado. Situacao da matricula: "
+                         << statusMatriculaTexto(p->getCliente()->getMatricula().getStatus()) << endl;
+                    break;
+                }
+            case 13:
+                {
+                    cout << "====== Historico de Pagamentos ======" << endl;
+                    cout << "CPF do cliente: ";
+                    cin >> cpf;
+                    Cliente* cliente = gerenciador.consultarCliente(cpf);
+                    cout << "Cliente: " << cliente->getNome() << endl;
+                    imprimirHistorico(gerenciador.historicoPagamentos(cpf));
+                    break;
+                }
+            case 14:
+                {
+                    cout << "====== Atualizar Inadimplencia (" << UtilData::hoje() << ") ======" << endl;
+                    vector<Cliente*> novos = gerenciador.atualizarInadimplencia(UtilData::hoje());
+                    if (novos.empty())
+                    {
+                        cout << "Nenhum cliente passou para inadimplente." << endl;
+                    }
+                    for (Cliente* c : novos)
+                    {
+                        cout << "- " << c->getNome() << " (CPF " << c->getCpf() << ") agora esta INADIMPLENTE." << endl;
+                    }
+                    break;
+                }
+            case 15:
+                painelRelatorioInadimplentes(gerenciador);
+                break;
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;

@@ -43,6 +43,9 @@ class Cliente : public Pessoa
 
         bool ValidarEntrada() const override;
 
+        // verifica se o cliente pode iniciar o treino no horario informado
+        void iniciarTreino(int horaAcesso) const;
+
         void restaurarMatricula(int codigo, const std::string& data, StatusMatricula status);
         std::string getDataInicio() const;
 

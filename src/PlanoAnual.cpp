@@ -26,3 +26,8 @@ std::string PlanoAnual::getTipoPlano() const
 Plano* PlanoAnual::clone() const {
   return new PlanoAnual(precoBase, mesesFidelidade, descontoFidelidade);
 }
+
+// Regra: plano anual (fidelidade) permite parcelar a mensalidade em ate 3x
+int PlanoAnual::getMaxParcelasCartao() const {
+  return 3;
+}

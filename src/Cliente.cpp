@@ -135,3 +135,24 @@ void Cliente::restaurarMatricula(int codigo, const std::string& data, StatusMatr
 std::string Cliente::getDataInicio() const {
     return matricula.getDataInicio();
 }
+
+void Cliente::iniciarTreino(int horaAcesso) const
+{
+    if (treinoDesignado == nullptr)
+    {
+        throw AcademiaException("Voce precisa ter um treino designado antes de inicia-lo.");
+    }
+
+    // Regra: apenas matriculas ativas podem treinar
+    if (matricula.getStatus() == StatusMatricula::INADIMPLENTE)
+    {
+        throw AcademiaException("Acesso bloqueado: matricula inadimplente. Regularize o pagamento.");
+    }
+    if (matricula.getStatus() == StatusMatricula::TRANCADA)
+    {
+        throw AcademiaException("Acesso bloqueado: matricula trancada.");
+    }
+
+    // Regra: restricao de horario depende do plano (polimorfismo)
+    planoAtual->aplicarRestricaoAcesso(horaAcesso);
+}

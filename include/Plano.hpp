@@ -12,6 +12,7 @@ class Plano
         virtual bool aplicarRestricaoAcesso(int horaAcesso) = 0;
         virtual std::string getTipoPlano() const = 0;
         virtual Plano* clone() const = 0;
+        virtual int getMaxParcelasCartao() const = 0;
         virtual ~Plano();
 };
 

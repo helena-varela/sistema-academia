@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
+#include "UtilData.hpp"
 GerenciadorAcademia::GerenciadorAcademia()
 {
   planosCadastrados.push_back(new PlanoMensal(100.0, 15.0));
@@ -15,6 +17,10 @@ GerenciadorAcademia::GerenciadorAcademia()
 
 GerenciadorAcademia::~GerenciadorAcademia()
 {
+  for(auto p : pagamentos){
+    delete p;
+  }
+  pagamentos.clear();
   for(auto c : clientes){
     delete c;
   }
@@ -83,6 +89,11 @@ void GerenciadorAcademia::atualizarCliente(const std::string &cpf, Cliente *novo
           instrutor->adicionarAlunoSupervisionado(novoC);
         }
       }
+      for (Pagamento* p : pagamentos) {
+        if (p->getCliente() == clienteAntigo) {
+          p->reassociarCliente(novoC);
+        }
+      }
       delete clienteAntigo;
       clientes[i] = novoC;
       std::cout << "Cliente atualizado com sucesso!" << std::endl;
@@ -102,6 +113,7 @@ void GerenciadorAcademia::removerCliente(const std::string &cpf)
           instrutor->removerAlunoSupervisionado(clienteARemover);
         }
       }
+      removerPagamentosDoCliente(clienteARemover);
       delete clientes[i];
       clientes.erase(clientes.begin() + i);
       std::cout << "Cliente removido com sucesso!" << std::endl;
@@ -120,6 +132,16 @@ Plano *GerenciadorAcademia::buscarPlano(const std::string &id)
       return plano;
   }
   return nullptr;
+}
+
+Plano *GerenciadorAcademia::criarPlanoDoCatalogo(const std::string &tipo)
+{
+  Plano *modelo = buscarPlano("Plano " + tipo);
+  if (modelo == nullptr)
+  {
+    throw AcademiaException("Tipo de Plano invalido (use Mensal ou Anual).");
+  }
+  return modelo->clone(); // cada cliente recebe sua propria copia
 }
 
 Treino *GerenciadorAcademia::buscarTreino(const std::string &id)
@@ -190,6 +212,196 @@ Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
     }
   }
   throw AcademiaException("Erro: Instrutor nao cadastrado!");
+}
+
+// pagamentos
+bool GerenciadorAcademia::existePagamentoAtivo(Cliente* cliente, const std::string& mesReferencia) const
+{
+  for (Pagamento* p : pagamentos)
+  {
+    if (p->getCliente() == cliente && p->getMesReferencia() == mesReferencia &&
+        (p->getStatus() == StatusPagamento::CONFIRMADO || p->getStatus() == StatusPagamento::PENDENTE))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool GerenciadorAcademia::existePagamentoConfirmado(Cliente* cliente, const std::string& mesReferencia) const
+{
+  for (Pagamento* p : pagamentos)
+  {
+    if (p->getCliente() == cliente && p->getMesReferencia() == mesReferencia &&
+        p->getStatus() == StatusPagamento::CONFIRMADO)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void GerenciadorAcademia::removerPagamentosDoCliente(Cliente* cliente)
+{
+  for (auto it = pagamentos.begin(); it != pagamentos.end();)
+  {
+    if ((*it)->getCliente() == cliente)
+    {
+      delete *it;
+      it = pagamentos.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+}
+
+Pagamento* GerenciadorAcademia::registrarPagamento(Pagamento* p)
+{
+  if (p == nullptr)
+  {
+    throw AcademiaException("Pagamento invalido.");
+  }
+
+  try
+  {
+    // Regra: o cliente precisa estar cadastrado na academia
+    if (std::find(clientes.begin(), clientes.end(), p->getCliente()) == clientes.end())
+    {
+      throw AcademiaException("Cliente do pagamento nao esta cadastrado.");
+    }
+
+    // Regra: nao pode haver dois pagamentos ativos para o mesmo mes
+    if (existePagamentoAtivo(p->getCliente(), p->getMesReferencia()))
+    {
+      throw AcademiaException("Ja existe um pagamento confirmado ou pendente para " +
+                              p->getMesReferencia() + ".");
+    }
+
+    p->validar(); // regras comuns + especificas de Pix/Cartao
+  }
+  catch (...)
+  {
+    delete p;
+    throw;
+  }
+
+  p->gerarCodigo();
+  pagamentos.push_back(p);
+
+  // Regra: Pix e confirmado na hora; cartao aguarda autorizacao
+  if (p->confirmacaoImediata())
+  {
+    confirmarPagamento(p->getCodigo());
+  }
+  return p;
+}
+
+Pagamento* GerenciadorAcademia::consultarPagamento(int codigo) const
+{
+  for (Pagamento* p : pagamentos)
+  {
+    if (p->getCodigo() == codigo)
+    {
+      return p;
+    }
+  }
+  throw AcademiaException("Pagamento nao encontrado.");
+}
+
+void GerenciadorAcademia::confirmarPagamento(int codigo)
+{
+  Pagamento* p = consultarPagamento(codigo);
+  p->confirmar();
+  reavaliarSituacaoFinanceira(p->getCliente(), UtilData::hoje());
+}
+
+void GerenciadorAcademia::cancelarPagamento(int codigo)
+{
+  consultarPagamento(codigo)->cancelar();
+}
+
+void GerenciadorAcademia::estornarPagamento(int codigo)
+{
+  Pagamento* p = consultarPagamento(codigo);
+  std::string hoje = UtilData::hoje();
+  p->estornar(hoje);
+  reavaliarSituacaoFinanceira(p->getCliente(), hoje);
+}
+
+std::vector<Pagamento*> GerenciadorAcademia::historicoPagamentos(const std::string& cpf) const
+{
+  std::vector<Pagamento*> historico;
+  for (Pagamento* p : pagamentos)
+  {
+    if (p->getCliente()->getCpf() == cpf)
+    {
+      historico.push_back(p);
+    }
+  }
+  return historico;
+}
+
+bool GerenciadorAcademia::clienteEmDia(Cliente* cliente, const std::string& dataAtual) const
+{
+  std::string mes = UtilData::mesDe(dataAtual);
+
+  // Regra: o cliente esta em dia se pagou o mes atual,
+  // se ainda nao passou do vencimento ou se a matricula comecou neste mes
+  if (existePagamentoConfirmado(cliente, mes))
+    return true;
+  if (UtilData::diaDe(dataAtual) <= Pagamento::DIA_VENCIMENTO)
+    return true;
+  if (UtilData::dataValida(cliente->getDataInicio()) && UtilData::mesDe(cliente->getDataInicio()) == mes)
+    return true;
+  return false;
+}
+
+void GerenciadorAcademia::reavaliarSituacaoFinanceira(Cliente* cliente, const std::string& dataAtual)
+{
+  Matricula& matricula = cliente->getMatricula();
+  bool emDia = clienteEmDia(cliente, dataAtual);
+
+  // Regra: quitar o mes reativa a matricula inadimplente
+  if (matricula.getStatus() == StatusMatricula::INADIMPLENTE && emDia)
+  {
+    matricula.alterarEstado(StatusMatricula::ATIVA);
+  }
+  // Regra: matricula ativa sem pagamento apos o vencimento fica inadimplente
+  else if (matricula.getStatus() == StatusMatricula::ATIVA && !emDia)
+  {
+    matricula.alterarEstado(StatusMatricula::INADIMPLENTE);
+  }
+}
+
+std::vector<Cliente*> GerenciadorAcademia::atualizarInadimplencia(const std::string& dataAtual)
+{
+  std::vector<Cliente*> novosInadimplentes;
+  for (Cliente* c : clientes)
+  {
+    StatusMatricula antes = c->getMatricula().getStatus();
+    reavaliarSituacaoFinanceira(c, dataAtual);
+    if (antes != StatusMatricula::INADIMPLENTE &&
+        c->getMatricula().getStatus() == StatusMatricula::INADIMPLENTE)
+    {
+      novosInadimplentes.push_back(c);
+    }
+  }
+  return novosInadimplentes;
+}
+
+std::vector<Cliente*> GerenciadorAcademia::listarInadimplentes() const
+{
+  std::vector<Cliente*> inadimplentes;
+  for (Cliente* c : clientes)
+  {
+    if (c->getMatricula().getStatus() == StatusMatricula::INADIMPLENTE)
+    {
+      inadimplentes.push_back(c);
+    }
+  }
+  return inadimplentes;
 }
 
 // parte de arquivos
@@ -276,6 +488,15 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
     }
   }
 
+  // pagamentos sao gravados depois dos clientes, pois referenciam o CPF
+  for (Pagamento *p : pagamentos)
+  {
+    arquivo << "PAGAMENTO;" << p->getTipo() << ";" << p->getCodigo() << ";"
+            << p->getCliente()->getCpf() << ";" << p->getMesReferencia() << ";"
+            << p->getDataPagamento() << ";" << p->getValorBase() << ";"
+            << p->getStatusTexto() << ";" << p->serializarDetalhes() << "\n";
+  }
+
   arquivo.close();
   if (arquivo.fail())
   {
@@ -301,6 +522,9 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
   }
 
   // limpa a memoria
+  for (Pagamento *p : pagamentos)
+    delete p;
+  pagamentos.clear();
   for (Cliente *c : clientes)
     delete c;
   clientes.clear();
@@ -390,6 +614,54 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       }
 
       clientes.push_back(novoCliente);
+    }
+    else if (tipo == "PAGAMENTO")
+    {
+      std::string tipoPag, codStr, cpf, mesRef, dataPag, valorStr, statusStr;
+      std::getline(ss, tipoPag, ';');
+      std::getline(ss, codStr, ';');
+      std::getline(ss, cpf, ';');
+      std::getline(ss, mesRef, ';');
+      std::getline(ss, dataPag, ';');
+      std::getline(ss, valorStr, ';');
+      std::getline(ss, statusStr, ';');
+
+      Cliente *dono = nullptr;
+      for (Cliente *c : clientes)
+      {
+        if (c->getCpf() == cpf)
+        {
+          dono = c;
+          break;
+        }
+      }
+      if (dono == nullptr)
+        continue; // pagamento de cliente inexistente e ignorado
+
+      Pagamento *p = nullptr;
+      if (tipoPag == "PIX")
+      {
+        std::string chave, descontoStr;
+        std::getline(ss, chave, ';');
+        std::getline(ss, descontoStr);
+        p = new PagamentoPix(dono, mesRef, dataPag, chave, std::stod(descontoStr));
+      }
+      else if (tipoPag == "CARTAO")
+      {
+        std::string parcelasStr, taxaStr, digitos;
+        std::getline(ss, parcelasStr, ';');
+        std::getline(ss, taxaStr, ';');
+        std::getline(ss, digitos);
+        p = new PagamentoCartao(dono, mesRef, dataPag, std::stoi(parcelasStr), digitos, std::stod(taxaStr));
+      }
+      else
+      {
+        continue;
+      }
+
+      // restaura sem revalidar: o pagamento ja passou pelas regras quando foi registrado
+      p->restaurar(std::stoi(codStr), std::stod(valorStr), Pagamento::textoParaStatus(statusStr));
+      pagamentos.push_back(p);
     }
   }
   arquivo.close();

@@ -57,7 +57,7 @@ int main()
                         cout << "Digite seu CPF: " << endl;
                         cin >> cpf;
                         Cliente* cliente = gerenciador.consultarCliente(cpf);
-                        interfaceCliente(*cliente);
+                        interfaceCliente(gerenciador, *cliente);
                         break;
                     }
                 case 2:

@@ -28,3 +28,8 @@ std::string PlanoMensal::getTipoPlano() const
 Plano* PlanoMensal::clone() const {
   return new PlanoMensal(precoBase, taxaInscricaoAvulsa);
 }
+
+// Regra: plano mensal so pode ser pago no cartao a vista
+int PlanoMensal::getMaxParcelasCartao() const {
+  return 1;
+}

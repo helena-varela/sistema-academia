@@ -14,6 +14,7 @@ class PlanoAnual : public Plano
         bool aplicarRestricaoAcesso(int horaAcesso) override;
         std::string getTipoPlano() const override;
         Plano* clone() const override;
+        int getMaxParcelasCartao() const override;
 };
 
 #endif
