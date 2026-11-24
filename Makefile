@@ -1,6 +1,6 @@
 # Variáveis de compilação
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Iinclude
+CXXFLAGS = -Wall -std=c++17 -Iinclude -MMD -MP
 
 # Pastas do projeto
 SRC_DIR = src
@@ -26,6 +26,9 @@ $(TARGET): $(OBJS)
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Inclui as dependencias geradas (-MMD): se um .hpp mudar, os .cpp que o incluem sao recompilados
+-include $(OBJS:.o=.d)
 
 # Regra para limpar os arquivos compilados (make clean)
 clean:
