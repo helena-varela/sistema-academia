@@ -138,13 +138,37 @@ static void painelRegistrarPagamento(GerenciadorAcademia& gerenciador)
     }
     else if (forma == 2)
     {
-        int parcelas;
-        string digitos;
-        cout << "Numero de parcelas (max. " << cliente->getPlanoAtual()->getMaxParcelasCartao()
-             << " no " << cliente->getPlanoAtual()->getTipoPlano() << "): ";
-        cin >> parcelas;
-        cout << "4 ultimos digitos do cartao: ";
-        cin >> digitos;
+        // Regra: o limite de parcelas vem do plano (polimorfismo de Plano)
+        const Plano* plano = cliente->getPlanoAtual();
+        int maxParcelas = plano->getMaxParcelasCartao();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        string parcelasTexto = lerCampo("Numero de parcelas (max. " + std::to_string(maxParcelas) + " no " +
+                                        plano->getTipoPlano() + "): ",
+            [maxParcelas, plano](const string& v) {
+                size_t lidos = 0;
+                int n = 0;
+                try {
+                    n = std::stoi(v, &lidos);
+                } catch (const std::exception&) {
+                    lidos = 0;
+                }
+                if (lidos == 0 || lidos != v.size() || n < 1)
+                {
+                    throw DadosInvalidosException("parcelas", "Digite um numero de parcelas valido (1 ou mais).");
+                }
+                if (n > maxParcelas)
+                {
+                    throw PagamentoRecusadoException("CARTAO", "O " + plano->getTipoPlano() + " permite no maximo " +
+                                                     std::to_string(maxParcelas) + " parcela(s).");
+                }
+            });
+        int parcelas = std::stoi(parcelasTexto);
+        string digitos = lerCampo("4 ultimos digitos do cartao: ", [](const string& v) {
+            if (v.size() != 4 || v.find_first_not_of("0123456789") != string::npos)
+            {
+                throw DadosInvalidosException("cartao", "Informe exatamente 4 digitos numericos.");
+            }
+        });
         pagamento = new PagamentoCartao(cliente, mesReferencia, UtilData::hoje(), parcelas, digitos);
     }
     else
