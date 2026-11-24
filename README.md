@@ -83,7 +83,9 @@ Contém os arquivos de extensão .cpp com a implementação real da lógica decl
 
 ## 📑 Diagrama de Classes
 
-O diagrama também está disponível como imagem em [`docs/mermaid-diagram.png`](docs/mermaid-diagram.png).
+O diagrama foi dividido em dois para facilitar a leitura: as classes do domínio e a hierarquia de exceções. As imagens também estão na pasta [`docs/`](docs/).
+
+### Classes do domínio
 
 ```mermaid
 classDiagram
@@ -146,39 +148,6 @@ direction BT
         -Vector~Treino~ treinosCadastrados
     }
 
-    class AcademiaException {
-        -String mensagemErro
-    }
-
-    class DadosInvalidosException {
-        -String campo
-    }
-    class RegistroNaoEncontradoException {
-        -String tipoRegistro
-        -String identificador
-    }
-    class RegistroDuplicadoException {
-        -String tipoRegistro
-        -String identificador
-    }
-    class TransicaoEstadoInvalidaException {
-        -String entidade
-        -String estadoAtual
-        -String estadoDestino
-    }
-    class AutenticacaoException {
-        -String perfil
-    }
-    class AcessoNegadoException {
-        -String recurso
-    }
-    class PagamentoRecusadoException {
-        -String formaPagamento
-    }
-    class PersistenciaException {
-        -String caminhoArquivo
-    }
-
     class Pagamento {
         -int ultimoCodigo$
         #int codigo
@@ -234,6 +203,57 @@ direction BT
     GerenciadorAcademia "1" *-- "0..*" Plano : cadastra
     GerenciadorAcademia "1" *-- "0..*" Treino : armazena
     GerenciadorAcademia "1" *-- "0..*" Pagamento : registra
+    Pagamento <|-- PagamentoPix
+    Pagamento <|-- PagamentoCartao
+    Pagamento "0..*" --> "1" Cliente : referente a
+    Pagamento "1" *-- "1" StatusPagamento : tem
+```
+
+### Hierarquia de exceções
+
+As exceções ficam em um diagrama separado para facilitar a leitura. Todas derivam de `AcademiaException`; a tabela **Exceções Personalizadas** mostra quais classes lançam cada uma.
+
+```mermaid
+classDiagram
+direction BT
+    class std_exception["std::exception"] {
+        +what() const char*
+    }
+
+    class AcademiaException {
+        -String mensagemErro
+    }
+
+    class DadosInvalidosException {
+        -String campo
+    }
+    class RegistroNaoEncontradoException {
+        -String tipoRegistro
+        -String identificador
+    }
+    class RegistroDuplicadoException {
+        -String tipoRegistro
+        -String identificador
+    }
+    class TransicaoEstadoInvalidaException {
+        -String entidade
+        -String estadoAtual
+        -String estadoDestino
+    }
+    class AutenticacaoException {
+        -String perfil
+    }
+    class AcessoNegadoException {
+        -String recurso
+    }
+    class PagamentoRecusadoException {
+        -String formaPagamento
+    }
+    class PersistenciaException {
+        -String caminhoArquivo
+    }
+
+    std_exception <|-- AcademiaException
     AcademiaException <|-- DadosInvalidosException
     AcademiaException <|-- RegistroNaoEncontradoException
     AcademiaException <|-- RegistroDuplicadoException
@@ -242,10 +262,6 @@ direction BT
     AcademiaException <|-- AcessoNegadoException
     AcademiaException <|-- PagamentoRecusadoException
     AcademiaException <|-- PersistenciaException
-    Pagamento <|-- PagamentoPix
-    Pagamento <|-- PagamentoCartao
-    Pagamento "0..*" --> "1" Cliente : referente a
-    Pagamento "1" *-- "1" StatusPagamento : tem
 ```
 
 ## 🧩 Conceitos de POO Aplicados
@@ -270,7 +286,7 @@ Todas herdam de `AcademiaException` (que herda de `std::exception`) e ficam em `
 |---|---|---|
 | `DadosInvalidosException` | `campo` | Validação de dados: nome/e-mail vazio, CPF inválido, senha curta, hora fora de 0–23, data ou mês mal formatado, opção de menu inválida (`Pessoa`, `Cliente`, `Treino`, `Pagamento`, menus) |
 | `RegistroNaoEncontradoException` | `tipoRegistro`, `identificador` | Cliente, instrutor, pagamento ou aluno supervisionado inexistente (`GerenciadorAcademia::consultar*`, `Instrutor::consultarAlunoSupervisionado`) |
-| `RegistroDuplicadoException` | `tipoRegistro`, `identificador` | Cadastro ou alteração com CPF já usado (`GerenciadorAcademia::cadastrarCliente`, `cadastrarInstrutor`) |
+| `RegistroDuplicadoException` | `tipoRegistro`, `identificador` | Cadastro ou alteração com CPF já usado, ou cadastro de instrutor com CREF já usado (`GerenciadorAcademia::cadastrarCliente`, `cadastrarInstrutor`, tela de cadastro) |
 | `TransicaoEstadoInvalidaException` | `entidade`, `estadoAtual`, `estadoDestino` | Mudança de estado proibida (`Matricula::alterarEstado`, `Pagamento::confirmar`/`cancelar`/`estornar`) |
 | `AutenticacaoException` | `perfil` | Login com usuário ou senha incorretos, senha atual errada ao trocar a senha (`GerenciadorAcademia::autenticar*`, `Pessoa::alterarSenha`) |
 | `AcessoNegadoException` | `recurso` | Treino bloqueado por matrícula inadimplente/trancada ou horário de pico; instrutor prescrevendo treino para aluno de outro instrutor (`Cliente::iniciarTreino`, `PlanoMensal::aplicarRestricaoAcesso`, `Instrutor::prescreverTreino`) |
