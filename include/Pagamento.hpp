@@ -28,15 +28,11 @@ class Pagamento
         double valorBase;            // mensalidade do plano no momento do pagamento
         StatusPagamento status;
 
-        double calcularMultaAtraso() const;
-
         // regras especificas de cada forma de pagamento (Template Method)
         virtual void validarEspecifico() const = 0;
 
     public:
         static const int DIA_VENCIMENTO = 10;
-        static constexpr double PERCENTUAL_MULTA = 0.02;       // 2% fixo
-        static constexpr double PERCENTUAL_JUROS_DIA = 0.001;  // 0,1% ao dia
 
         Pagamento(Cliente* cliente, const std::string& mesReferencia, const std::string& dataPagamento);
         virtual ~Pagamento();
@@ -44,7 +40,6 @@ class Pagamento
         // comportamentos polimorficos
         virtual double calcularValorFinal() const = 0;
         virtual bool confirmacaoImediata() const = 0;
-        virtual bool podeEstornar(const std::string& dataAtual) const = 0;
         virtual std::string getTipo() const = 0;
         virtual std::string getDescricao() const = 0;
         virtual std::string serializarDetalhes() const = 0;
@@ -52,11 +47,7 @@ class Pagamento
         void validar() const;     // regras comuns + validarEspecifico()
         void confirmar();
         void cancelar();
-        void estornar(const std::string& dataAtual);
-
-        bool pagoEmAtraso() const;
-        int diasDeAtraso() const;
-        std::string getDataVencimento() const;
+        void estornar();
 
         int getCodigo() const;
         Cliente* getCliente() const;

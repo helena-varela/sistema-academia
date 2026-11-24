@@ -35,12 +35,7 @@ static void imprimirPagamento(const Pagamento* p)
          << " | Valor base: R$ " << p->getValorBase()
          << " | Total: R$ " << p->calcularValorFinal()
          << " | " << p->getStatusTexto() << endl;
-    cout << "      " << p->getDescricao();
-    if (p->pagoEmAtraso())
-    {
-        cout << " | " << p->diasDeAtraso() << " dia(s) de atraso (multa aplicada)";
-    }
-    cout << endl;
+    cout << "      " << p->getDescricao() << endl;
     cout.unsetf(std::ios::fixed);
 }
 
@@ -152,6 +147,21 @@ static void painelRelatorioInadimplentes(GerenciadorAcademia& gerenciador)
     cout.unsetf(std::ios::fixed);
 }
 
+static void lerAlteracaoSenha(string& senhaAtual, string& novaSenha)
+{
+    string confirmacao;
+    cout << "Senha atual: ";
+    cin >> senhaAtual;
+    cout << "Nova senha (min. 4 caracteres): ";
+    cin >> novaSenha;
+    cout << "Confirme a nova senha: ";
+    cin >> confirmacao;
+    if (novaSenha != confirmacao)
+    {
+        throw AcademiaException("As senhas nao conferem.");
+    }
+}
+
 // ===================== menus =====================
 
 void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
@@ -167,10 +177,11 @@ void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
         cout << "4. Visualizar Treino" << endl;
         cout << "5. Iniciar Treino" << endl;
         cout << "6. Meus Pagamentos" << endl;
+        cout << "7. Alterar Senha" << endl;
         cout << "0. Retornar" << endl;
 
         cin >> opcao;
-        if (opcao < 0 || opcao > 6)
+        if (opcao < 0 || opcao > 7)
         {
             throw AcademiaException("Opcao invalida!");
         }
@@ -231,6 +242,15 @@ void interfaceCliente(GerenciadorAcademia& gerenciador, Cliente& cliente)
                 imprimirHistorico(gerenciador.historicoPagamentos(cliente.getCpf()));
                 cout << "=========================" << endl;
                 break;
+            case 7:
+            {
+                string senhaAtual, novaSenha;
+                lerAlteracaoSenha(senhaAtual, novaSenha);
+                cliente.alterarSenha(senhaAtual, novaSenha);
+                gerenciador.salvarEmArquivo(ARQUIVO_BACKUP);
+                cout << "Senha alterada com sucesso!" << endl;
+                break;
+            }
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;
@@ -256,10 +276,11 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
     cout << "2. Prescrever Treino" << endl;
     cout << "3. Remover Aluno da Supervisao" << endl;
     cout << "4. Listar Alunos Supervisionados" << endl;
+    cout << "5. Alterar Senha" << endl;
     cout << "0. Retornar" << endl;
 
     cin >> opcao;
-    if (opcao < 0 || opcao > 4)
+    if (opcao < 0 || opcao > 5)
     {
         throw AcademiaException("Opcao invalida!");
     }
@@ -371,6 +392,14 @@ void interfaceInstrutor(GerenciadorAcademia& gerenciador, Instrutor* instrutor)
                     cout << "=========================" << endl;
                     break; 
                 }
+            case 5:
+                {
+                    string senhaAtual, novaSenha;
+                    lerAlteracaoSenha(senhaAtual, novaSenha);
+                    instrutor->alterarSenha(senhaAtual, novaSenha);
+                    cout << "Senha alterada com sucesso!" << endl;
+                    break;
+                }
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;
@@ -406,10 +435,12 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
     cout << "13. Historico de Pagamentos do Cliente" << endl;
     cout << "14. Atualizar Inadimplencia do Mes" << endl;
     cout << "15. Relatorio de Inadimplentes" << endl;
+    cout << "---------- Conta ----------" << endl;
+    cout << "16. Alterar Senha do Gerente" << endl;
     cout << "0. Retornar" << endl;
 
     cin >> opcao;
-    if (opcao < 0 || opcao > 15)
+    if (opcao < 0 || opcao > 16)
     {
         throw AcademiaException("Opcao invalida!");
     }
@@ -419,7 +450,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 1:
                 {
                     cout << "====== Painel de Cadastro (Cliente) ======" << endl;
-                    string nome, cpf, email, planoTipo;
+                    string nome, cpf, email, planoTipo, senha;
                     cout << "Digite o Nome do Cliente: ";
                     cin.ignore();
                     getline(cin, nome);
@@ -429,11 +460,14 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     getline(cin, email);
                     cout << "Digite o Plano (Mensal/Anual): ";
                     getline(cin, planoTipo);
+                    cout << "Defina a senha de acesso do cliente (min. 4 caracteres): ";
+                    getline(cin, senha);
 
                     Plano* plano = gerenciador.criarPlanoDoCatalogo(planoTipo);
 
                     Cliente* c = new Cliente(nome, cpf, email, plano, UtilData::hoje());
                     try {
+                        c->definirSenha(senha);
                         gerenciador.cadastrarCliente(c);
                     } catch (...){
                         delete c;
@@ -623,7 +657,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 5:
                 {
                     cout << "====== Painel de Cadastro (Instrutor) ======" << endl;
-                    string nome, cpf, email, cref, especialidade;
+                    string nome, cpf, email, cref, especialidade, senha;
                     cout << "Digite o Nome do Instrutor: ";
                     cin.ignore();
                     getline(cin, nome);
@@ -635,6 +669,8 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
                     getline(cin, cref);
                     cout << "Digite a especialidade: ";
                     getline(cin, especialidade);
+                    cout << "Defina a senha de acesso do instrutor (min. 4 caracteres): ";
+                    getline(cin, senha);
                     if (nome.empty() || cpf.empty() || email.empty() || cref.empty() || especialidade.empty())
                     {
                         throw AcademiaException("Todos os campos devem ser preenchidos!");
@@ -642,6 +678,7 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
 
                     Instrutor* i = new Instrutor(nome, cpf, email, cref, especialidade);
                     try {
+                        i->definirSenha(senha);
                         gerenciador.cadastrarInstrutor(i);
                     } catch (...){
                         delete i;
@@ -859,6 +896,15 @@ void interfaceGerenciador(GerenciadorAcademia& gerenciador)
             case 15:
                 painelRelatorioInadimplentes(gerenciador);
                 break;
+            case 16:
+                {
+                    cout << "====== Alterar Senha do Gerente ======" << endl;
+                    string senhaAtual, novaSenha;
+                    lerAlteracaoSenha(senhaAtual, novaSenha);
+                    gerenciador.alterarSenhaGerente(senhaAtual, novaSenha);
+                    cout << "Senha alterada com sucesso!" << endl;
+                    break;
+                }
             case 0:
                 cout << "Retornando ao menu principal..." << endl;
                 break;

@@ -1,8 +1,6 @@
 #include "PagamentoPix.hpp"
-#include "UtilData.hpp"
 
 #include <sstream>
-#include <iomanip>
 
 PagamentoPix::PagamentoPix(Cliente* cliente,
                            const std::string& mesReferencia,
@@ -29,11 +27,7 @@ void PagamentoPix::validarEspecifico() const
 
 double PagamentoPix::calcularValorFinal() const
 {
-    // Regra: Pix em dia ganha desconto; Pix atrasado paga multa e perde o desconto
-    if (pagoEmAtraso())
-    {
-        return valorBase + calcularMultaAtraso();
-    }
+    // Regra: pagamento via Pix tem desconto
     return valorBase * (1.0 - percentualDesconto);
 }
 
@@ -41,12 +35,6 @@ bool PagamentoPix::confirmacaoImediata() const
 {
     // Regra: Pix e compensado na hora
     return true;
-}
-
-bool PagamentoPix::podeEstornar(const std::string& dataAtual) const
-{
-    // Regra: Pix so pode ser estornado no mesmo dia do pagamento
-    return UtilData::diasEntre(dataPagamento, dataAtual) == 0;
 }
 
 std::string PagamentoPix::getTipo() const
@@ -57,11 +45,7 @@ std::string PagamentoPix::getTipo() const
 std::string PagamentoPix::getDescricao() const
 {
     std::ostringstream os;
-    os << "Pix (chave: " << chavePix << ")";
-    if (!pagoEmAtraso())
-    {
-        os << " - desconto de " << percentualDesconto * 100 << "%";
-    }
+    os << "Pix (chave: " << chavePix << ") - desconto de " << percentualDesconto * 100 << "%";
     return os.str();
 }
 

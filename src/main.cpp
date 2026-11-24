@@ -54,27 +54,39 @@ int main()
                 case 1:
                     {
                         cout << "[Interface do Cliente]" << endl;
-                        cout << "Digite seu CPF: " << endl;
+                        string senha;
+                        cout << "Digite seu CPF: ";
                         cin >> cpf;
-                        Cliente* cliente = gerenciador.consultarCliente(cpf);
+                        cout << "Digite sua senha: ";
+                        cin >> senha;
+                        Cliente* cliente = gerenciador.autenticarCliente(cpf, senha);
                         interfaceCliente(gerenciador, *cliente);
                         break;
                     }
                 case 2:
                     {
                         cout << "[Interface do Instrutor]" << endl;
-                        cout << "Digite seu CREF: " << endl;
+                        string senha;
+                        cout << "Digite seu CREF: ";
                         cin >> cref;
+                        cout << "Digite sua senha: ";
+                        cin >> senha;
                         {
-                            Instrutor* instrutor = gerenciador.consultarInstrutor(cref);
+                            Instrutor* instrutor = gerenciador.autenticarInstrutor(cref, senha);
                             interfaceInstrutor(gerenciador, instrutor);
                         }
                         break;
                     }
                 case 3:
-                    cout << "[Interface do Gerenciador]" << endl;
-                    interfaceGerenciador(gerenciador);
-                    break;
+                    {
+                        string senha;
+                        cout << "[Interface do Gerenciador]" << endl;
+                        cout << "Digite a senha do gerente: ";
+                        cin >> senha;
+                        gerenciador.autenticarGerente(senha);
+                        interfaceGerenciador(gerenciador);
+                        break;
+                    }
 
                 case 0:
                     executando = false;

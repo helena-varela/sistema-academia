@@ -5,6 +5,9 @@
 #include "AcademiaException.hpp"
 
 class Pessoa {
+    private:
+        std::string senhaHash; // a senha nunca e guardada em texto puro
+
     protected:
         std::string nome;
         std::string cpf;
@@ -22,6 +25,14 @@ class Pessoa {
         std::string getEmail() const;
 
         virtual bool ValidarEntrada() const;
+
+        // autenticacao
+        void definirSenha(const std::string& senha);
+        void alterarSenha(const std::string& senhaAtual, const std::string& novaSenha);
+        bool autenticar(const std::string& senha) const;
+        std::string getSenhaHash() const;
+        void restaurarSenhaHash(const std::string& hash);
+        static std::string gerarHash(const std::string& texto);
 
         virtual ~Pessoa() = 0;
 };

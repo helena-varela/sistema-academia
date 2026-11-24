@@ -1,5 +1,4 @@
 #include "PagamentoCartao.hpp"
-#include "UtilData.hpp"
 
 #include <cctype>
 #include <sstream>
@@ -9,11 +8,9 @@ PagamentoCartao::PagamentoCartao(Cliente* cliente,
                                  const std::string& mesReferencia,
                                  const std::string& dataPagamento,
                                  int numeroParcelas,
-                                 const std::string& ultimos4Digitos,
-                                 double taxaJurosParcela)
+                                 const std::string& ultimos4Digitos)
     : Pagamento(cliente, mesReferencia, dataPagamento),
       numeroParcelas(numeroParcelas),
-      taxaJurosParcela(taxaJurosParcela),
       ultimos4Digitos(ultimos4Digitos)
 {
     if (numeroParcelas < 1)
@@ -42,41 +39,18 @@ void PagamentoCartao::validarEspecifico() const
         throw AcademiaException("O " + cliente->getPlanoAtual()->getTipoPlano() +
                                 " permite no maximo " + std::to_string(maxParcelas) + " parcela(s).");
     }
-
-    // Regra: cada parcela deve ter um valor minimo
-    if (getValorParcela() < VALOR_MINIMO_PARCELA)
-    {
-        std::ostringstream os;
-        os << std::fixed << std::setprecision(2)
-           << "Valor da parcela (R$ " << getValorParcela() << ") abaixo do minimo de R$ "
-           << VALOR_MINIMO_PARCELA << ".";
-        throw AcademiaException(os.str());
-    }
 }
 
 double PagamentoCartao::calcularValorFinal() const
 {
-    // Regra: cartao nao tem desconto; paga multa se atrasado
-    // e juros por parcela acima de PARCELAS_SEM_JUROS
-    double total = valorBase + calcularMultaAtraso();
-    if (numeroParcelas > PARCELAS_SEM_JUROS)
-    {
-        total *= 1.0 + taxaJurosParcela * (numeroParcelas - PARCELAS_SEM_JUROS);
-    }
-    return total;
+    // Regra: cartao nao tem desconto, cobra o valor cheio da mensalidade
+    return valorBase;
 }
 
 bool PagamentoCartao::confirmacaoImediata() const
 {
     // Regra: cartao fica pendente ate a autorizacao da operadora
     return false;
-}
-
-bool PagamentoCartao::podeEstornar(const std::string& dataAtual) const
-{
-    // Regra: cartao pode ser estornado em ate 7 dias
-    int dias = UtilData::diasEntre(dataPagamento, dataAtual);
-    return dias >= 0 && dias <= PRAZO_ESTORNO_DIAS;
 }
 
 std::string PagamentoCartao::getTipo() const
@@ -90,17 +64,13 @@ std::string PagamentoCartao::getDescricao() const
     os << std::fixed << std::setprecision(2)
        << "Cartao final " << ultimos4Digitos << " - " << numeroParcelas
        << "x de R$ " << getValorParcela();
-    if (numeroParcelas > PARCELAS_SEM_JUROS)
-    {
-        os << " (com juros)";
-    }
     return os.str();
 }
 
 std::string PagamentoCartao::serializarDetalhes() const
 {
     std::ostringstream os;
-    os << numeroParcelas << ";" << taxaJurosParcela << ";" << ultimos4Digitos;
+    os << numeroParcelas << ";" << ultimos4Digitos;
     return os.str();
 }
 

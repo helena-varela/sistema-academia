@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "UtilData.hpp"
 GerenciadorAcademia::GerenciadorAcademia()
+  : senhaGerenteHash(Pessoa::gerarHash(SENHA_GERENTE_PADRAO))
 {
   planosCadastrados.push_back(new PlanoMensal(100.0, 15.0));
   planosCadastrados.push_back(new PlanoAnual(80.0, 12, 0.1));
@@ -214,6 +215,51 @@ Instrutor* GerenciadorAcademia::consultarInstrutor(const std::string& cref)
   throw AcademiaException("Erro: Instrutor nao cadastrado!");
 }
 
+// autenticacao
+// a mensagem de erro e a mesma para usuario inexistente e senha errada,
+// para nao revelar quais CPFs/CREFs estao cadastrados
+Cliente* GerenciadorAcademia::autenticarCliente(const std::string& cpf, const std::string& senha)
+{
+  for (Cliente* c : clientes)
+  {
+    if (c->getCpf() == cpf && c->autenticar(senha))
+    {
+      return c;
+    }
+  }
+  throw AcademiaException("CPF ou senha incorretos.");
+}
+
+Instrutor* GerenciadorAcademia::autenticarInstrutor(const std::string& cref, const std::string& senha)
+{
+  for (Instrutor* i : instrutores)
+  {
+    if (i->getCref() == cref && i->autenticar(senha))
+    {
+      return i;
+    }
+  }
+  throw AcademiaException("CREF ou senha incorretos.");
+}
+
+void GerenciadorAcademia::autenticarGerente(const std::string& senha) const
+{
+  if (Pessoa::gerarHash(senha) != senhaGerenteHash)
+  {
+    throw AcademiaException("Senha do gerente incorreta.");
+  }
+}
+
+void GerenciadorAcademia::alterarSenhaGerente(const std::string& senhaAtual, const std::string& novaSenha)
+{
+  autenticarGerente(senhaAtual);
+  if (novaSenha.size() < 4)
+  {
+    throw AcademiaException("A senha deve ter pelo menos 4 caracteres.");
+  }
+  senhaGerenteHash = Pessoa::gerarHash(novaSenha);
+}
+
 // pagamentos
 bool GerenciadorAcademia::existePagamentoAtivo(Cliente* cliente, const std::string& mesReferencia) const
 {
@@ -325,9 +371,8 @@ void GerenciadorAcademia::cancelarPagamento(int codigo)
 void GerenciadorAcademia::estornarPagamento(int codigo)
 {
   Pagamento* p = consultarPagamento(codigo);
-  std::string hoje = UtilData::hoje();
-  p->estornar(hoje);
-  reavaliarSituacaoFinanceira(p->getCliente(), hoje);
+  p->estornar();
+  reavaliarSituacaoFinanceira(p->getCliente(), UtilData::hoje());
 }
 
 std::vector<Pagamento*> GerenciadorAcademia::historicoPagamentos(const std::string& cpf) const
@@ -425,6 +470,8 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
     throw AcademiaException("Erro: Nao foi possivel abrir o arquivo para salvar.");
   }
 
+  arquivo << "GERENTE;" << senhaGerenteHash << "\n";
+
   for (Plano *p : planosCadastrados)
   {
     if (p)
@@ -454,7 +501,8 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
     if (i)
     {
       arquivo << "INSTRUTOR;" << i->getCpf() << ";" << i->getNome() << ";"
-              << i->getEmail() << ";" << i->getCref() << ";" << i->getEspecialidade() << "\n";
+              << i->getEmail() << ";" << i->getCref() << ";" << i->getEspecialidade() << ";"
+              << i->getSenhaHash() << "\n";
     }
   }
 
@@ -484,7 +532,8 @@ void GerenciadorAcademia::salvarEmArquivo(std::string nomeArquivo)
 
       arquivo << "CLIENTE;" << c->getCodigoMatricula() << ";" << c->getDataInicio() << ";" 
               << c->getNome() << ";" << c->getCpf() << ";" << c->getEmail() << ";" 
-              << planoId << ";" << treinoId << ";" << instrutorCpf << ";" << statusStr << "\n";
+              << planoId << ";" << treinoId << ";" << instrutorCpf << ";" << statusStr << ";"
+              << c->getSenhaHash() << "\n";
     }
   }
 
@@ -550,6 +599,13 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
     {
       continue;
     }
+    else if (tipo == "GERENTE")
+    {
+      std::string hash;
+      std::getline(ss, hash);
+      if (!hash.empty())
+        senhaGerenteHash = hash;
+    }
     else if (tipo == "TREINO")
     {
       std::string idFoco, duracaoStr, exerciciosAgrupados;
@@ -574,10 +630,18 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       std::getline(ss, cpf, ';');
       std::getline(ss, nome, ';');
       std::getline(ss, email, ';');
+      std::string senhaHash;
       std::getline(ss, cref, ';');
-      std::getline(ss, esp);
+      std::getline(ss, esp, ';');
+      std::getline(ss, senhaHash);
 
-      instrutores.push_back(new Instrutor(nome, cpf, email, cref, esp));
+      Instrutor *novoInstrutor = new Instrutor(nome, cpf, email, cref, esp);
+      // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
+      if (senhaHash.empty())
+        novoInstrutor->definirSenha(cpf);
+      else
+        novoInstrutor->restaurarSenhaHash(senhaHash);
+      instrutores.push_back(novoInstrutor);
     }
     else if (tipo == "CLIENTE")
     {
@@ -589,8 +653,10 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       std::getline(ss, email, ';');
       std::getline(ss, planoId, ';');
       std::getline(ss, treinoId, ';');
+      std::string senhaHash;
       std::getline(ss, instrutorCpf, ';');
-      std::getline(ss, statusStr);
+      std::getline(ss, statusStr, ';');
+      std::getline(ss, senhaHash);
 
       StatusMatricula status = StatusMatricula::ATIVA;
       if (statusStr == "INADIMPLENTE") status = StatusMatricula::INADIMPLENTE;
@@ -604,6 +670,11 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       Cliente *novoCliente = new Cliente(nome, cpf, email, p, dataInicio);
 
       novoCliente->restaurarMatricula(std::stoi(matStr), dataInicio, status);
+      // backups antigos nao tem senha: a senha inicial passa a ser o proprio CPF
+      if (senhaHash.empty())
+        novoCliente->definirSenha(cpf);
+      else
+        novoCliente->restaurarSenhaHash(senhaHash);
 
       if (t)
         novoCliente->associarTreino(t);
@@ -648,11 +719,10 @@ void GerenciadorAcademia::carregarDeArquivo(std::string nomeArquivo)
       }
       else if (tipoPag == "CARTAO")
       {
-        std::string parcelasStr, taxaStr, digitos;
+        std::string parcelasStr, digitos;
         std::getline(ss, parcelasStr, ';');
-        std::getline(ss, taxaStr, ';');
         std::getline(ss, digitos);
-        p = new PagamentoCartao(dono, mesRef, dataPag, std::stoi(parcelasStr), digitos, std::stod(taxaStr));
+        p = new PagamentoCartao(dono, mesRef, dataPag, std::stoi(parcelasStr), digitos);
       }
       else
       {

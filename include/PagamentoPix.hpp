@@ -13,7 +13,7 @@ class PagamentoPix : public Pagamento
         void validarEspecifico() const override;
 
     public:
-        static constexpr double DESCONTO_PADRAO = 0.05; // 5% para pagamento em dia
+        static constexpr double DESCONTO_PADRAO = 0.05; // 5% de desconto no Pix
 
         PagamentoPix(Cliente* cliente,
                      const std::string& mesReferencia,
@@ -23,7 +23,6 @@ class PagamentoPix : public Pagamento
 
         double calcularValorFinal() const override;
         bool confirmacaoImediata() const override;
-        bool podeEstornar(const std::string& dataAtual) const override;
         std::string getTipo() const override;
         std::string getDescricao() const override;
         std::string serializarDetalhes() const override;

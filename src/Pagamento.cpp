@@ -27,7 +27,7 @@ Pagamento::Pagamento(Cliente* cliente, const std::string& mesReferencia, const s
     {
         throw AcademiaException("Cliente sem plano nao pode realizar pagamento.");
     }
-    // Regra: o valor cobrado e a mensalidade do plano atual do cliente (polimorfismo de Plano)
+    // o valor cobrado e a mensalidade do plano atual do cliente (polimorfismo de Plano)
     valorBase = cliente->getPlanoAtual()->calcularMensalidade();
 }
 
@@ -37,24 +37,10 @@ Pagamento::~Pagamento()
 
 void Pagamento::validar() const
 {
-    // Regra: matricula trancada nao gera cobranca
+    // Regra: matricula trancada nao recebe pagamentos
     if (cliente->getMatricula().getStatus() == StatusMatricula::TRANCADA)
     {
         throw AcademiaException("Matricula trancada nao pode receber pagamentos.");
-    }
-
-    // Regra: nao se paga mes anterior ao inicio da matricula
-    std::string mesInicio = UtilData::mesDe(cliente->getDataInicio());
-    if (UtilData::mesComoNumero(mesReferencia) < UtilData::mesComoNumero(mesInicio))
-    {
-        throw AcademiaException("Mes de referencia anterior ao inicio da matricula (" + mesInicio + ").");
-    }
-
-    // Regra: so e possivel adiantar ate o proximo mes
-    std::string mesDoPagamento = UtilData::mesDe(dataPagamento);
-    if (UtilData::mesComoNumero(mesReferencia) > UtilData::mesComoNumero(mesDoPagamento) + 1)
-    {
-        throw AcademiaException("So e possivel adiantar o pagamento do proximo mes.");
     }
 
     validarEspecifico();
@@ -100,53 +86,13 @@ void Pagamento::cancelar()
     alterarStatus(StatusPagamento::CANCELADO);
 }
 
-void Pagamento::estornar(const std::string& dataAtual)
+void Pagamento::estornar()
 {
     if (status != StatusPagamento::CONFIRMADO)
     {
         throw AcademiaException("Apenas pagamentos confirmados podem ser estornados.");
     }
-    if (!podeEstornar(dataAtual))
-    {
-        throw AcademiaException("Prazo de estorno expirado para pagamento via " + getTipo() + ".");
-    }
     alterarStatus(StatusPagamento::ESTORNADO);
-}
-
-std::string Pagamento::getDataVencimento() const
-{
-    // Regra: no primeiro mes, quem se matricula depois do dia de vencimento
-    // tem como vencimento a propria data da matricula (nao paga multa por isso)
-    std::string inicio = cliente->getDataInicio();
-    if (UtilData::dataValida(inicio) && UtilData::mesDe(inicio) == mesReferencia &&
-        UtilData::diaDe(inicio) > DIA_VENCIMENTO)
-    {
-        return inicio;
-    }
-
-    std::string dia = (DIA_VENCIMENTO < 10 ? "0" : "") + std::to_string(DIA_VENCIMENTO);
-    return dia + "/" + mesReferencia;
-}
-
-int Pagamento::diasDeAtraso() const
-{
-    int dias = UtilData::diasEntre(getDataVencimento(), dataPagamento);
-    return dias > 0 ? dias : 0;
-}
-
-bool Pagamento::pagoEmAtraso() const
-{
-    return diasDeAtraso() > 0;
-}
-
-double Pagamento::calcularMultaAtraso() const
-{
-    // Regra: atraso gera multa fixa de 2% + juros de 0,1% por dia
-    if (!pagoEmAtraso())
-    {
-        return 0.0;
-    }
-    return valorBase * (PERCENTUAL_MULTA + PERCENTUAL_JUROS_DIA * diasDeAtraso());
 }
 
 int Pagamento::getCodigo() const { return codigo; }

@@ -24,6 +24,7 @@ class GerenciadorAcademia
         std::vector<Plano*> planosCadastrados;
         std::vector<Treino*> treinosCadastrados;
         std::vector<Pagamento*> pagamentos;
+        std::string senhaGerenteHash;
 
         bool existePagamentoAtivo(Cliente* cliente, const std::string& mesReferencia) const;
         bool existePagamentoConfirmado(Cliente* cliente, const std::string& mesReferencia) const;
@@ -45,6 +46,13 @@ class GerenciadorAcademia
         Instrutor* consultarInstrutorPorCpf(const std::string& cpf);
         void cadastrarTreino(Treino* t);
         
+        // autenticacao
+        static constexpr const char* SENHA_GERENTE_PADRAO = "admin123";
+        Cliente* autenticarCliente(const std::string& cpf, const std::string& senha);
+        Instrutor* autenticarInstrutor(const std::string& cref, const std::string& senha);
+        void autenticarGerente(const std::string& senha) const;
+        void alterarSenhaGerente(const std::string& senhaAtual, const std::string& novaSenha);
+
         // pagamentos
         Pagamento* registrarPagamento(Pagamento* p);
         Pagamento* consultarPagamento(int codigo) const;

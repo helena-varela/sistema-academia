@@ -13,8 +13,6 @@ namespace UtilData
     int diaDe(const std::string& data);                   // DD/MM/AAAA -> DD
     bool dataValida(const std::string& data);
     bool mesValido(const std::string& mes);
-    int mesComoNumero(const std::string& mes);            // MM/AAAA -> numero comparavel
-    int diasEntre(const std::string& inicio, const std::string& fim); // fim - inicio, em dias
 }
 
 #endif

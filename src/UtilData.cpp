@@ -16,20 +16,6 @@ namespace
         }
         return !s.empty();
     }
-
-    std::tm paraTm(const std::string& data)
-    {
-        if (!UtilData::dataValida(data))
-        {
-            throw AcademiaException("Data invalida: " + data + " (use DD/MM/AAAA).");
-        }
-        std::tm t{};
-        t.tm_mday = std::stoi(data.substr(0, 2));
-        t.tm_mon = std::stoi(data.substr(3, 2)) - 1;
-        t.tm_year = std::stoi(data.substr(6, 4)) - 1900;
-        t.tm_hour = 12; // meio-dia evita problemas com horario de verao
-        return t;
-    }
 }
 
 namespace UtilData
@@ -85,23 +71,5 @@ namespace UtilData
             return false;
         int m = std::stoi(mes.substr(0, 2));
         return m >= 1 && m <= 12;
-    }
-
-    int mesComoNumero(const std::string& mes)
-    {
-        if (!mesValido(mes))
-        {
-            throw AcademiaException("Mes invalido: " + mes + " (use MM/AAAA).");
-        }
-        return std::stoi(mes.substr(3, 4)) * 12 + std::stoi(mes.substr(0, 2));
-    }
-
-    int diasEntre(const std::string& inicio, const std::string& fim)
-    {
-        std::tm a = paraTm(inicio);
-        std::tm b = paraTm(fim);
-        std::time_t ta = std::mktime(&a);
-        std::time_t tb = std::mktime(&b);
-        return static_cast<int>(std::difftime(tb, ta) / (60 * 60 * 24) + (tb >= ta ? 0.5 : -0.5));
     }
 }
